@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from app.database.database import Users
 
 class SingupForm(FlaskForm):
-    login = StringField('Your login (at least 3 characters long)', validators=[DataRequired(), Length(min=3, max=20)])
+    login = StringField('Your login (at least 3 characters long)', validators=[DataRequired(), Length(min=4, max=15)])
     password = PasswordField('Your password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up!')
