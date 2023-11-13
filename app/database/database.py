@@ -1,7 +1,10 @@
 from .category import create_income_category_table, create_outcome_category_table, create_outcome_subcategory_table
 from .users import create_users_table
-from .user_categories import create_user_income_categories_table, create_user_outcome_categories_table, \
-    create_user_outcome_subcategories_table
+from .user_categories import (
+    create_user_income_categories_table,
+    create_user_outcome_categories_table,
+    create_user_outcome_subcategories_table,
+)
 from .groups import create_group, create_user_group_table
 from .transactions import create_income_history_table, create_outcome_history_table
 
