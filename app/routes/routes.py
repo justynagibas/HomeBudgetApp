@@ -50,3 +50,8 @@ def logout():
     else:
         flash("You need to log in before you can log out")
     return redirect(url_for("home"))
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
