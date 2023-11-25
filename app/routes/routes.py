@@ -7,6 +7,14 @@ from app.auth.auth_forms import SingupForm, LoginForm
 
 
 @app.route("/")
+@app.route("/hello")
+def hello():
+    if not current_user.is_authenticated:
+        return render_template("hello.html")
+    else:
+        return redirect(url_for("home"))
+
+
 @app.route("/home")
 def home():
     return render_template("home.html")
@@ -16,7 +24,7 @@ def home():
 def signup():
     if current_user.is_authenticated:
         flash("You need to log out before you can create a new account.")
-        return redirect(url_for("home"))
+        return redirect(url_for("hello"))
     form = SingupForm()
     if form.validate_on_submit():
         insert_user(form.login.data, form.password.data)
@@ -29,16 +37,16 @@ def signup():
 def login():
     if current_user.is_authenticated:
         flash("You are already logged in.")
-        return redirect(url_for("home"))
+        return redirect(url_for("hello"))
     form = LoginForm()
     if form.validate_on_submit():
         user = check_user_credentials(form.login.data, form.password.data)
         if user:
             login_user(user)
             flash(f"Successfully logged in as {current_user.user_name}.")
-            return redirect(url_for("home"))
+            return redirect(url_for("hello"))
         else:
-            flash("Login unsuccessfull. Please check username and password.", "danger")
+            flash("Login failed. Please check username and password.", "danger")
     return render_template("login.html", form=form, user=current_user)
 
 
@@ -49,7 +57,7 @@ def logout():
         flash("You have been logged out.")
     else:
         flash("You need to log in before you can log out")
-    return redirect(url_for("home"))
+    return redirect(url_for("hello"))
 
 
 @app.route("/about")
