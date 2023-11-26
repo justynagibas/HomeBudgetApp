@@ -1,11 +1,14 @@
+from app import app, request
+from flask import render_template, redirect, url_for, flash
 import sqlalchemy
-
 from app import app, db
 from flask import render_template, redirect, url_for, request, flash
 from app.database import database
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
+from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
+from app.transaction_tracking.transaction_tracking import get_categories
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 import pandas as pd
 
@@ -74,6 +77,20 @@ def about():
 @app.route("/tutorial")
 def tutorial():
     return render_template("tutorial.html")
+
+@app.route("/transaction_tracking", methods=["GET", "POST"])
+def transaction_tracking():
+    if current_user.is_authenticated:
+        form1 = OutcomeForm()
+        categories1 = get_categories(current_user.user_name, 'outcome')
+        form2 = IncomeForm()
+        categories2 = get_categories(current_user.user_name, 'income')
+        return render_template("transaction_tracking.html", form1=form1, form2=form2, categories1=categories1,
+                               categories2=categories2)
+
+    else:
+        flash("First create account or log in if you have one!")
+    return redirect(url_for("login"))
 
 
 @app.route("/addgoal", methods=["GET", "POST"])
