@@ -1,0 +1,33 @@
+{% extends "main_layout.html" %} {% block content %}
+<div class="top-buffer"></div>
+
+<div class="d-flex justify-content-center">
+    <div><h1><strong>Home Budget App</strong></h1></div>
+</div>
+
+<div class="d-flex justify-content-center mt-4">
+    <h5>Please sign in below or register Yourself to use Home Budget App</h5>
+</div>
+
+
+<div class="row row mt-5">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <a href="{{ url_for('login') }}" style="text-decoration: none">
+            <button class="btn btn-outline-dark btn-block" style="height: 50px;">Sign In</button>
+        </a>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <a href="{{ url_for('signup') }}" style="text-decoration: none">
+            <button class="btn btn-outline-dark btn-block" style="height: 50px;">Sign Up</button>
+        </a>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+{% endblock %}

@@ -1,5 +1,6 @@
 {% extends "main_layout.html" %} {% block content %}
-    <div class="card col-4 d-flex m-all">
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card col-4 d-flex m-all bg-dark border-0 text-light">
         <article class="card-body">
         <h4 class="card-title mb-4 mt-1">Sign up</h4>
             <form method="post" action="" novalidate>
@@ -47,9 +48,10 @@
                     {% endif %}
                 </div> <!-- form-group// --> 
                 <div class="form-group">
-                    {{ form.submit(class="btn btn-primary btn-block")}}
+                    {{ form.submit(class="btn btn-outline-light btn-block")}}
                 </div> <!-- form-group// -->                                                           
             </form>
         </article>
-        </div> <!-- card.// -->
+    </div> <!-- card.// -->
+</div>
 {% endblock %}

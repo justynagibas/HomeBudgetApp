@@ -1,7 +1,8 @@
 {% extends "main_layout.html" %} {% block content %}
-    <div class="card col-4 d-flex m-all">
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card col-4 d-flex m-all bg-dark border-0 text-light">
         <article class="card-body">
-        <a href=" {{ url_for('signup')}}" class="float-right btn btn-outline-primary">Sign up</a>
+        <a href=" {{ url_for('signup')}}" class="float-right btn btn-outline-light">Sign up</a>
         <h4 class="card-title mb-4 mt-1">Log in</h4>
             <form method="POST" action="" novalidate>
                 {{ form.hidden_tag() }}
@@ -16,7 +17,7 @@
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.login(class="form-control", placeholder="Login", type="text") }}
+                            {{ form.login(class="form-control ", placeholder="Login", type="text") }}
                         {% endif %}
                 </div> <!-- form-group// -->
                 <div class="form-group">
@@ -34,9 +35,11 @@
                     {% endif %}
                 </div> <!-- form-group// --> 
                 <div class="form-group">
-                    {{ form.submit(class="btn btn-primary btn-block")}}
+                    {{ form.submit(class="btn btn-outline-light btn-block")}}
                 </div> <!-- form-group// -->                                                         
             </form>
         </article>
         </div> <!-- card.// -->
+    </div>
+</div>
 {% endblock %}
