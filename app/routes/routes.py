@@ -1,8 +1,6 @@
-from app import app, request
-from flask import render_template, redirect, url_for, flash
+from app import app, request, db
+from flask import render_template, redirect, url_for, flash, request
 import sqlalchemy
-from app import app, db
-from flask import render_template, redirect, url_for, request, flash
 from app.database import database
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
@@ -81,16 +79,28 @@ def tutorial():
 @app.route("/transaction_tracking", methods=["GET", "POST"])
 def transaction_tracking():
     if current_user.is_authenticated:
-        form1 = OutcomeForm()
-        categories1 = get_categories(current_user.user_name, 'outcome')
-        form2 = IncomeForm()
-        categories2 = get_categories(current_user.user_name, 'income')
-        return render_template("transaction_tracking.html", form1=form1, form2=form2, categories1=categories1,
-                               categories2=categories2)
-
+        if request.method == 'POST':
+            if 'outcome' in request.form.keys():
+                form = OutcomeForm()
+                main_cat, sub_cat = get_categories(current_user.user_name, 'outcome')
+                form.main_category.choices = main_cat
+                form.subcategory.choices = sub_cat
+                return render_template("transaction_tracking.html", form=form)
+            elif 'income' in request.form.keys():
+                form = IncomeForm()
+                main_cat = get_categories(current_user.user_name, 'income')
+                form.main_category.choices = main_cat
+                return render_template("transaction_tracking.html", form=form)
+            elif 'add' in request.form.keys():
+                if form.validate_on_submit():
+                    flash("Transaction saved successfully", 'success')
+                    return render_template("transaction_tracking.html")
+                else:
+                    return render_template("transaction_tracking.html", form=form)
+        return render_template("transaction_tracking.html")
     else:
         flash("First create account or log in if you have one!")
-    return redirect(url_for("login"))
+        return redirect(url_for("login"))
 
 
 @app.route("/addgoal", methods=["GET", "POST"])

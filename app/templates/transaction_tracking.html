@@ -7,90 +7,99 @@
     <div class="row justify-content-between" style="margin-top: 200px">
         <div class="col-lg-4 text-center">
             <div class="vertical-div">
-                    <button type="button" class="btn btn-primary" style="scale:3.5" onclick="showModal('income')">Add income</button>
+                <form action="{{ url_for("transaction_tracking") }}" method="POST">
+                    <button type="submit" class="btn btn-primary" style="scale:3.5" name="income">Add income</button>
+                </form>
             </div>
         </div>
         <div class="col-lg-4 text-center">
             <div class="vertical-div">
-                    <button type="button" class="btn btn-primary" style="scale:3.5" onclick="showModal('outcome')">Add outcome</button>
+                <form action="{{ url_for("transaction_tracking") }}" method="POST">
+                    <button type="submit" class="btn btn-primary" style="scale:3.5" name="outcome">Add outcome</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="popupModal" tabindex="-1" role="dialog" aria-labelledby="popupModalLabel" aria-hidden="true">
+{% if form %}
+    <div class="modal show" id="modal" tabindex="-1" role="dialog" aria-labelledby="popupModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="popupModalLabel">Add outcome</h5>
+                    <h5 class="modal-title" id="modalLabel">Add outcome</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="" method="post" id="dynamicForm">
-                        {{ form1.hidden_tag() }}
+                    <form method="POST" action="" novalidate>
+                        {{ form.hidden_tag() }}
                         <div class="form-group">
                             <label for="name">Note:</label>
-                            <input type="text" class="form-control">
+                            {% if form.note.errors %}
+                                {{ form.note(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.note.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.note(class="form-control", type="text") }}
+                            {% endif %}
                         </div>
                         <div class="form-group">
                             <label for="name">Value:</label>
-                            <input type="text" class="form-control" required>
+                            {% if form.value.errors %}
+                                {{ form.value(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.value.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.value(class="form-control", type="number") }}
+                            {% endif %}
                         </div>
                         <div class="form-group">
                             <label for="name">Date:</label>
-                            <input type="date" max='9999-12-31' class="form-control" required>
+                            {% if form.date.errors %}
+                                {{ form.date(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.date.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.date(class="form-control", type="date") }}
+                            {% endif %}
                         </div>
                         <div class="form-group">
                             <label for="name">Main category:</label>
-                            <select class="form-control" aria-label="Main category" required>
-                                <option hidden disabled selected value> Choose main category </option>
-                                {% for category in categories1[0] %}
-                                    <option value="{{ loop.index0 }}">{{ category }}</option>
-                                {% endfor %}
-                            </select>
+                            {{ form.main_category(class="form-control", id="main-category",hidden=True, disabled=True) }}
                         </div>
-                        <div class="form-group" id="subcategoryField">
+                        {% if 'subcategory' in form._fields %}
+                        <div class="form-group">
                             <label for="name">Subcategory:</label>
-                            <select class="form-control" aria-label="Subcategory" required>
-                                <option hidden disabled selected value> Choose subcategory </option>
-                                {% for category in categories1[1] %}
-                                    <option value="{{ category.id }}">{{ category.category_name }}</option>
+                            <select class="form-control" name="subcategory" id="subcategory">
+                                {% for option in form.subcategory %}
+                                    {% if loop.first %}
+                                        <option value="" hidden disabled selected value>Choose main category</option>
+                                    {% endif %}
+                                    {{ option }}
                                 {% endfor %}
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary" name="add">Submit</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-function showModal(formType) {
-    var form = document.getElementById('dynamicForm');
-    form.setAttribute('action', '/submit?form_type=' + formType);
-
-    var modalTitle = document.getElementById('popupModalLabel');
-    if (formType === 'income') {
-        modalTitle.innerText = 'Add Income';
-        hideSubcategoryField();
-    } else {
-        modalTitle.innerText = 'Add Outcome';
-        showSubcategoryField();
-    }
-
-    $('#popupModal').modal('show');
-}
-
-    function hideSubcategoryField() {
-        var subcategoryField = document.getElementById('subcategoryField');
-        subcategoryField.style.display = 'none';
-    }
-
-    function showSubcategoryField() {
-        var subcategoryField = document.getElementById('subcategoryField');
-        subcategoryField.style.display = 'block';
-    }
+{% endif %}
+<script>
+var modalPopup = new bootstrap.Modal(document.getElementById("modal"), {});
+modalPopup.show();
 </script>
+
 {% endblock %}

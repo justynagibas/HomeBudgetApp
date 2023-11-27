@@ -1,20 +1,20 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DecimalField, DateField, SubmitField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms import StringField, FloatField, DateField, SubmitField, SelectField
+from wtforms.validators import DataRequired, Length, InputRequired
 
 class OutcomeForm(FlaskForm):
-    note = StringField("Description of your expense", validators=[DataRequired(), Length(max=100)])
-    value = DecimalField("Value your expense", validators=[DataRequired()])
-    date = DateField("Date of making expense", validators=[DataRequired()])
-    main_category = StringField("Main category of your expense", validators=[DataRequired(), Length(max=100)])
-    subcategory = StringField("Subcategory of your expense", validators=[DataRequired(), Length(max=100)])
+
+    note = StringField("Note:", validators=[DataRequired(), Length(max=100)])
+    value = FloatField("Value:", validators=[DataRequired()])
+    date = DateField("Date:", validators=[DataRequired()])
+    main_category = SelectField("Main category:", choices=[("", "-- select an option --")], validators=[InputRequired(), Length(max=100)], default="")
+    subcategory = SelectField("Subcategory:", choices=[("", "-- select an option --")], validators=[InputRequired(), Length(max=100)], default="")
     submit = SubmitField("Submit")
 
-    #TODO: add necessary validators
-
 class IncomeForm(FlaskForm):
-    note = StringField("Description of your expense", validators=[DataRequired(), Length(max=100)])
-    value = DecimalField("Value your expense", validators=[DataRequired()])
-    date = DateField("Date of making expense", validators=[DataRequired()])
-    main_category = StringField("Main category of your expense", validators=[DataRequired(), Length(max=100)])
+
+    note = StringField("Note:", validators=[DataRequired(), Length(max=100)])
+    value = FloatField("Value:", validators=[DataRequired()])
+    date = DateField("Date:", validators=[DataRequired()])
+    main_category = SelectField("Main category:", choices=[],  validators=[DataRequired(), Length(max=100)])
     submit = SubmitField("Submit")

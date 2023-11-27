@@ -13,3 +13,6 @@ def get_categories(username, category_type):
             user_outcome_subcategories = db.session.query(OutcomeSubcategory.category_name).join(UserOutcomeSubcategory).filter_by(user_id=userId).all()
             return user_outcome_categories, user_outcome_subcategories
     return None
+
+
+# def add_spending()
