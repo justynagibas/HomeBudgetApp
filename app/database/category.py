@@ -24,7 +24,7 @@ def create_goals_table(db):
     class Goal(db.Model):
         __tablename__ = "goals"
         id = Column(Integer, Sequence("seq_goals", start=1), primary_key=True)
-        name = Column(String, nullable=False)
+        name = Column(String, nullable=False, unique=True)
         target_amount = Column(Integer)
         deadline = Column(Date)
         user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
