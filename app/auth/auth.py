@@ -1,19 +1,20 @@
 from app import login_manager, bcrypt, db
-from app.database.database import Users, Groups, Category,Subcategory,UserGroup,Transactions,Goals,Budget
+from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 
 
 def insert_user(username, password):
     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
     user = Users(user_name=username, password=hashed_password)
     db.session.add(user)
-    db.session.commit() # co to robi?
+    db.session.commit()  # co to robi?
     db.session.flush()
     db.session.refresh(user)
 
     # Add default categories to the user
     userId = user.id
 
-    default_categories = ["Income",
+    default_categories = [
+        "Income",
         "Food",
         "Apartment",
         "Transport",
@@ -31,9 +32,9 @@ def insert_user(username, password):
     userId = db.session.query(Users).filter(Users.user_name == username).first().id
 
     for category in default_categories:
-        if category == 'Income':
+        if category == "Income":
             record = Category(name=category, user_id=userId, undeletable=True)
-        elif category == 'Others':
+        elif category == "Others":
             record = Category(name=category, user_id=userId, undeletable=True)
         else:
             record = Category(name=category, user_id=userId, undeletable=False)

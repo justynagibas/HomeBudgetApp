@@ -11,7 +11,7 @@ def create_transactions_table(db):
         subcategory_id = Column(Integer, ForeignKey("subcategory.id"), nullable=True)
         goal_id = Column(Integer, ForeignKey("goals.id"), nullable=True)
         user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-        #transaction_type = Column('TransactionType', Enum('Income', 'Expense', name='transaction_type_enum'))
+        # transaction_type = Column('TransactionType', Enum('Income', 'Expense', name='transaction_type_enum'))
         user_note = Column(String(100), nullable=True)
 
     return Transaction

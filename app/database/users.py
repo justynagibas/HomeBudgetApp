@@ -10,7 +10,7 @@ def create_users_table(db, UserMixin):
         __table_args__ = (
             CheckConstraint("LENGTH(user_name) > 3"),
             CheckConstraint("LENGTH(user_name) <= 15"),
-            CheckConstraint("LENGTH(password) = 60")
+            CheckConstraint("LENGTH(password) = 60"),
         )
 
     return Users

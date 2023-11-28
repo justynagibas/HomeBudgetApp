@@ -6,7 +6,7 @@ from app.database import database
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
-from app.database.database import Users, Groups, Category,Subcategory,UserGroup,Transactions,Goals,Budget
+from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 import pandas as pd
 
 from app.routes.forms import AddGoalForm, AddGoalProgress
@@ -75,7 +75,8 @@ def about():
 def tutorial():
     return render_template("tutorial.html")
 
-@app.route("/addgoal", methods=['GET', 'POST'])
+
+@app.route("/addgoal", methods=["GET", "POST"])
 def goals():
     if not current_user.is_authenticated:
         flash("You need to log in")
@@ -87,12 +88,14 @@ def goals():
         return render_template("addgoal.html", form=form)
     return render_template("addgoal.html", form=form)
 
+
 def insert_goal(name, target_amount, deadline, user_id):
     goal = Goals(name=name, target_amount=target_amount, deadline=deadline, user_id=user_id)
     db.session.add(goal)
     db.session.commit()
 
-@app.route("/addgoalprogress", methods=['GET', 'POST'])
+
+@app.route("/addgoalprogress", methods=["GET", "POST"])
 def add_goal_progress():
     if not current_user.is_authenticated:
         flash("You need to log in")
@@ -117,41 +120,51 @@ def add_goal_progress():
         return render_template("addgoalprogress.html", form=form)
     return render_template("addgoalprogress.html", form=form)
 
+
 def insert_goal(name, target_amount, deadline, user_id):
     goal = Goals(name=name, target_amount=target_amount, deadline=deadline, user_id=user_id)
     db.session.add(goal)
     db.session.commit()
 
-@app.route("/showgoals", methods=['GET', 'POST'])
+
+@app.route("/showgoals", methods=["GET", "POST"])
 def show_goals():
     if not current_user.is_authenticated:
         flash("You need to log in")
         return redirect(url_for("hello"))
 
-    goals = db.session.query(Goals.id, Goals.name, Goals.target_amount, Goals.deadline,Goals.user_id)
-    transactions = db.session.query(db.func.sum(Transactions.value), Transactions.goal_id).group_by(Transactions.goal_id).order_by(Transactions.goal_id).all()
+    goals = db.session.query(Goals.id, Goals.name, Goals.target_amount, Goals.deadline, Goals.user_id)
+    transactions = (
+        db.session.query(db.func.sum(Transactions.value), Transactions.goal_id)
+        .group_by(Transactions.goal_id)
+        .order_by(Transactions.goal_id)
+        .all()
+    )
 
     # Convert to Pandas DataFrame
-    df_progres = pd.DataFrame(transactions, columns=['current_progres', 'id'])
+    df_progres = pd.DataFrame(transactions, columns=["current_progres", "id"])
     df_goals = pd.DataFrame(goals)
 
-    new_df = pd.merge(df_goals, df_progres, on='id', how='outer')
-    #new_df = new_df[new_df['user_id'] == current_user.id]
+    new_df = pd.merge(df_goals, df_progres, on="id", how="outer")
+    # new_df = new_df[new_df['user_id'] == current_user.id]
     return new_df.to_html()
 
-@app.route("/showtransactions", methods=['GET', 'POST'])
+
+@app.route("/showtransactions", methods=["GET", "POST"])
 def show_transactions():
     if not current_user.is_authenticated:
         flash("You need to log in")
         return redirect(url_for("hello"))
-    results = db.session.query(Transactions.id,
-                               Transactions.transaction_date,
-                               Transactions.value,
-                               Transactions.category_id,
-                               Transactions.subcategory_id,
-                               Transactions.goal_id,
-                               Transactions.user_id,
-                               Transactions.user_note)
+    results = db.session.query(
+        Transactions.id,
+        Transactions.transaction_date,
+        Transactions.value,
+        Transactions.category_id,
+        Transactions.subcategory_id,
+        Transactions.goal_id,
+        Transactions.user_id,
+        Transactions.user_note,
+    )
 
     # Convert to Pandas DataFrame
     df = pd.DataFrame(results)

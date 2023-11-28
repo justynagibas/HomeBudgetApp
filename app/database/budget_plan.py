@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer,  Sequence, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, Sequence, ForeignKey, CheckConstraint
 
 
 def create_budget_table(db):
@@ -10,9 +10,6 @@ def create_budget_table(db):
         category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
         year = Column(Integer, nullable=False)
         month = Column(Integer, nullable=False)
-        __table_args__ = (
-            CheckConstraint("month >= 1"),
-            CheckConstraint("month <= 12")
-        )
-    return Budget
+        __table_args__ = (CheckConstraint("month >= 1"), CheckConstraint("month <= 12"))
 
+    return Budget
