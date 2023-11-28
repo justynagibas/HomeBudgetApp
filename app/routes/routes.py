@@ -9,6 +9,9 @@ from app.auth.auth_forms import SingupForm, LoginForm
 from app.database.database import *
 import pandas as pd
 
+from app.routes.forms import AddGoalForm
+
+
 @app.route("/")
 @app.route("/hello")
 def hello():
@@ -72,12 +75,29 @@ def about():
 def tutorial():
     return render_template("tutorial.html")
 
-@app.route("/goals")
+@app.route("/addgoal", methods=['GET', 'POST'])
 def goals():
-    print(current_user.id)
-    results = db.session.query(OutcomeSubcategory.category_name)
+    if not current_user.is_authenticated:
+        flash("You need to log in")
+        return redirect(url_for("hello"))
+    form = AddGoalForm()
+    if form.validate_on_submit():
+        insert_goal(form.name.data, form.target_amount.data, form.deadline.data, current_user.id)
+        flash(f"New Goal has been added", "success")
+        return render_template("addgoal.html", form=form)
+    return render_template("addgoal.html", form=form)
 
+def insert_goal(name, target_amount, deadline, user_id):
+    goal = Goals(name=name, target_amount=target_amount, deadline=deadline, user_id=user_id)
+    db.session.add(goal)
+    db.session.commit()
+
+@app.route("/showgoals", methods=['GET', 'POST'])
+def show_goals():
+    if not current_user.is_authenticated:
+        flash("You need to log in")
+        return redirect(url_for("hello"))
+    results = db.session.query(Goals.name, Goals.target_amount,Goals.deadline,Goals.user_id)
     # Convert to Pandas DataFrame
     df = pd.DataFrame(results)
     return df.to_html()
-    return render_template("tutorial.html")

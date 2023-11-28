@@ -1,0 +1,41 @@
+{% extends "main_layout.html" %} {% block content %}
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card col-4 d-flex m-all bg-dark border-0 text-light">
+        <article class="card-body">
+        <h4 class="card-title mb-4 mt-1">Log in</h4>
+            <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div>
+                        {{ form.name.label }}<br>
+                        {{ form.name(size=32) }}<br>
+                        {% for error in form.name.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        {{ form.target_amount.label }}<br>
+                        {{ form.target_amount(size=32) }}<br>
+                        {% for error in form.target_amount.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        {{ form.deadline.label }}<br>
+                        {{ form.deadline(size=32) }}<br>
+                        {% for error in form.deadline.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        {{ form.submit() }}
+                    </div>
+                </form>
+        </article>
+        </div> <!-- card.// -->
+    </div>
+</div>
+{% endblock %}
