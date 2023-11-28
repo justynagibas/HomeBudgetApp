@@ -4,7 +4,7 @@ from sqlalchemy_utils import database_exists, create_database
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 
-db_url = "postgresql://postgres:postgres@localhost:5432/HomeBudget"
+db_url = "postgresql://postgres:postgres@localhost:5432/HomeBudgetDB"
 
 if not database_exists(db_url):
     create_database(db_url)

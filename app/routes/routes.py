@@ -1,10 +1,13 @@
-from app import app
+import sqlalchemy
+
+from app import app, db
 from flask import render_template, redirect, url_for, request, flash
 from app.database import database
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
-
+from app.database.database import *
+import pandas as pd
 
 @app.route("/")
 @app.route("/hello")
@@ -67,4 +70,14 @@ def about():
 
 @app.route("/tutorial")
 def tutorial():
+    return render_template("tutorial.html")
+
+@app.route("/goals")
+def goals():
+    print(current_user.id)
+    results = db.session.query(OutcomeSubcategory.category_name)
+
+    # Convert to Pandas DataFrame
+    df = pd.DataFrame(results)
+    return df.to_html()
     return render_template("tutorial.html")
