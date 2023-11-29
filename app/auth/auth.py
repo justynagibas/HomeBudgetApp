@@ -1,5 +1,5 @@
 from app import login_manager, bcrypt, db
-from app.database.database import Users, UserIncomeCategory, UserOutcomeCategory, OutcomeCategory, IncomeCategory
+from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 
 
 def insert_user(username, password):
@@ -7,15 +7,12 @@ def insert_user(username, password):
     user = Users(user_name=username, password=hashed_password)
     db.session.add(user)
     db.session.commit()
-    db.session.flush()
-    db.session.refresh(user)
 
     # Add default categories to the user
     userId = user.id
 
-    income_default_categories = ["Salary", "Others"]
-
-    outcome_default_categories = [
+    default_categories = [
+        "Income",
         "Food",
         "Apartment",
         "Transport",
@@ -32,17 +29,14 @@ def insert_user(username, password):
 
     userId = db.session.query(Users).filter(Users.user_name == username).first().id
 
-    for income_category in income_default_categories:
-        categoryId = db.session.query(IncomeCategory).filter(IncomeCategory.category_name == income_category).first().id
-        user_income_category = UserIncomeCategory(user_id=userId, income_category_id=categoryId)
-        db.session.add(user_income_category)
-
-    for outcome_category in outcome_default_categories:
-        categoryId = (
-            db.session.query(OutcomeCategory).filter(OutcomeCategory.category_name == outcome_category).first().id
-        )
-        user_outcome_category = UserOutcomeCategory(user_id=userId, outcome_category_id=categoryId)
-        db.session.add(user_outcome_category)
+    for category in default_categories:
+        if category == "Income":
+            record = Category(name=category, user_id=userId, undeletable=True)
+        elif category == "Others":
+            record = Category(name=category, user_id=userId, undeletable=True)
+        else:
+            record = Category(name=category, user_id=userId, undeletable=False)
+        db.session.add(record)
 
     db.session.commit()
 
