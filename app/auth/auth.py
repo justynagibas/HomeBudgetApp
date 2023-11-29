@@ -6,9 +6,7 @@ def insert_user(username, password):
     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
     user = Users(user_name=username, password=hashed_password)
     db.session.add(user)
-    db.session.commit()  # co to robi?
-    db.session.flush()
-    db.session.refresh(user)
+    db.session.commit()
 
     # Add default categories to the user
     userId = user.id
