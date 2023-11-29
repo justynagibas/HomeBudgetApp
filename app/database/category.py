@@ -6,7 +6,6 @@ def create_category_table(db):
         __tablename__ = "category"
         id = Column(Integer, Sequence("seq_income_category_id", start=1), primary_key=True)
         name = Column(String, nullable=False)
-        description = Column("Description", String)
         user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
         undeletable = Column(Boolean, nullable=False)
 
