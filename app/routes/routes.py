@@ -79,25 +79,28 @@ def tutorial():
 @app.route("/transaction_tracking", methods=["GET", "POST"])
 def transaction_tracking():
     if current_user.is_authenticated:
+        form_outcome = OutcomeForm(prefix='outcome')
+        main_cat_out, sub_cat = get_categories(current_user.user_name, 'outcome')
+        form_outcome.main_category.choices += [cat[0] for cat in main_cat_out]
+        form_outcome.subcategory.choices += [cat[0] for cat in sub_cat]
+        form_income = IncomeForm(prefix='income')
+        main_cat_in = get_categories(current_user.user_name, 'income')
+        form_income.main_category.choices += [cat[0] for cat in main_cat_in]
         if request.method == 'POST':
-            if 'outcome' in request.form.keys():
-                form = OutcomeForm()
-                main_cat, sub_cat = get_categories(current_user.user_name, 'outcome')
-                form.main_category.choices = main_cat
-                form.subcategory.choices = sub_cat
-                return render_template("transaction_tracking.html", form=form)
-            elif 'income' in request.form.keys():
-                form = IncomeForm()
-                main_cat = get_categories(current_user.user_name, 'income')
-                form.main_category.choices = main_cat
-                return render_template("transaction_tracking.html", form=form)
-            elif 'add' in request.form.keys():
-                if form.validate_on_submit():
-                    flash("Transaction saved successfully", 'success')
-                    return render_template("transaction_tracking.html")
-                else:
-                    return render_template("transaction_tracking.html", form=form)
-        return render_template("transaction_tracking.html")
+            if form_outcome.submit.data:
+                if form_outcome.validate():
+                    #TODO: add to database and flush forms here
+                    flash("Good outcome form, add to database", 'success')
+                    return render_template("transaction_tracking.html", form_outcome=OutcomeForm(),
+                                           form_income=IncomeForm())
+            elif form_income.submit.data:
+                if form_income.validate():
+                    # TODO: add to database and flush forms here
+                    flash("Good income form, add to database", 'success')
+                    return render_template("transaction_tracking.html", form_outcome=OutcomeForm(),
+                                           form_income=IncomeForm())
+        return render_template("transaction_tracking.html", form_outcome=form_outcome, form_income=form_income)
+
     else:
         flash("First create account or log in if you have one!")
         return redirect(url_for("login"))
