@@ -153,16 +153,16 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <label for="name">Main category:</label>
-                            {% if form_income.main_category.errors %}
-                                {{ form_income.main_category(class="form-control is-invalid") }}
+                            <label for="name">Subcategory:</label>
+                            {% if form_income.subcategory.errors %}
+                                {{ form_income.subcategory(class="form-control is-invalid") }}
                                 <div class="invalid-feedback">
-                                    {% for error in form_income.main_category.errors %}
+                                    {% for error in form_income.subcategory.errors %}
                                         <span>{{ error }}</span>
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form_income.main_category(class="form-control", id="main-category") }}
+                                {{ form_income.subcategory(class="form-control", id="subcategory") }}
                             {% endif %}
                         </div>
                         {{ form_income.submit(class="btn btn-primary btn-block", id="submit-income" )}}

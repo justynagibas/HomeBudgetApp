@@ -1,18 +1,26 @@
 from app import db
-from app.database.database import Users, UserIncomeCategory, UserOutcomeCategory, \
-    UserOutcomeSubcategory, IncomeCategory, OutcomeCategory, OutcomeSubcategory
+from app.database.database import Users, Groups, Category, Subcategory, Transactions
 
-def get_categories(username, category_type):
-    userId = db.session.query(Users).filter(Users.user_name == username).first().id
-    if userId:
-        if category_type == "income":
-            user_income_categories = db.session.query(IncomeCategory.category_name).join(UserIncomeCategory).filter_by(user_id=userId).all()
-            return user_income_categories
-        elif category_type =="outcome":
-            user_outcome_categories = db.session.query(OutcomeCategory.category_name).join(UserOutcomeCategory).filter_by(user_id=userId).all()
-            user_outcome_subcategories = db.session.query(OutcomeSubcategory.category_name).join(UserOutcomeSubcategory).filter_by(user_id=userId).all()
-            return user_outcome_categories, user_outcome_subcategories
-    return None
+def get_categories(userId, category_type):
+    if category_type == "income":
+        user_income_categories = db.session.query(Subcategory.name).join(Category).filter(Category.user_id==userId, Category.name=="Income").all()
+        return user_income_categories
+    elif category_type =="outcome":
+        user_outcome_categories = db.session.query(Category.name).filter(Category.user_id==userId).all()
+        user_outcome_categories.remove(('Income',))
+        user_outcome_subcategories = db.session.query(Subcategory.name).join(Category).filter(Category.user_id==userId, Category.name!='Income').all()
+        return user_outcome_categories, user_outcome_subcategories
 
 
-# def add_spending()
+def add_transaction(form, userID, transaction_type):
+    subcategory_id = db.session.query(Subcategory.id).filter(Subcategory.name == form.subcategory.data).all()
+    if not subcategory_id:
+        subcategory_id = None
+    record = Transactions(transaction_date = form.date.data, value=form.value.data, subcategory_id=subcategory_id, user_id=userID, user_note=form.note.data)
+    if transaction_type == "income":
+        record.category_id = db.session.query(Category.id).filter(Category.name=="Income").all()[0][0]
+    elif transaction_type == "outcome":
+        record.category_id = db.session.query(Category.id).filter(Category.name == form.main_category.data).all()[0][0]
+
+    db.session.add(record)
+    db.session.commit()

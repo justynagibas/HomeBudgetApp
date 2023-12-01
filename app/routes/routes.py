@@ -6,7 +6,7 @@ from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
 from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
-from app.transaction_tracking.transaction_tracking import get_categories
+from app.transaction_tracking.transaction_tracking import get_categories, add_transaction
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 import pandas as pd
 
@@ -80,25 +80,23 @@ def tutorial():
 def transaction_tracking():
     if current_user.is_authenticated:
         form_outcome = OutcomeForm(prefix='outcome')
-        main_cat_out, sub_cat = get_categories(current_user.user_name, 'outcome')
+        main_cat_out, sub_cat = get_categories(current_user.id, 'outcome')
         form_outcome.main_category.choices += [cat[0] for cat in main_cat_out]
         form_outcome.subcategory.choices += [cat[0] for cat in sub_cat]
         form_income = IncomeForm(prefix='income')
-        main_cat_in = get_categories(current_user.user_name, 'income')
-        form_income.main_category.choices += [cat[0] for cat in main_cat_in]
+        subcat_in = get_categories(current_user.id, 'income')
+        form_income.subcategory.choices += [cat[0] for cat in subcat_in]
         if request.method == 'POST':
             if form_outcome.submit.data:
                 if form_outcome.validate():
-                    #TODO: add to database and flush forms here
-                    flash("Good outcome form, add to database", 'success')
-                    return render_template("transaction_tracking.html", form_outcome=OutcomeForm(),
-                                           form_income=IncomeForm())
+                    add_transaction(form_outcome,current_user.id, "outcome")
+                    flash("Added outcome successfully!", 'success')
+                    return redirect(url_for("transaction_tracking"))
             elif form_income.submit.data:
                 if form_income.validate():
-                    # TODO: add to database and flush forms here
-                    flash("Good income form, add to database", 'success')
-                    return render_template("transaction_tracking.html", form_outcome=OutcomeForm(),
-                                           form_income=IncomeForm())
+                    add_transaction(form_income, current_user.id, "income")
+                    flash("Added income successfully!", 'success')
+                    return redirect(url_for("transaction_tracking"))
         return render_template("transaction_tracking.html", form_outcome=form_outcome, form_income=form_income)
 
     else:
@@ -149,12 +147,6 @@ def add_goal_progress():
         flash(f"Goal Progress has been added", "success")
         return render_template("addgoalprogress.html", form=form)
     return render_template("addgoalprogress.html", form=form)
-
-
-def insert_goal(name, target_amount, deadline, user_id):
-    goal = Goals(name=name, target_amount=target_amount, deadline=deadline, user_id=user_id)
-    db.session.add(goal)
-    db.session.commit()
 
 
 @app.route("/showgoals", methods=["GET", "POST"])
