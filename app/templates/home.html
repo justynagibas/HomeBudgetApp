@@ -128,8 +128,14 @@
                 </div> 
                 {% endfor %}
             </div>
-            <div class="col-md-4" style = "display: grid; place-items: center; height: 100%;">
-                <canvas id="pie_1"></canvas>
+            <div class="col-md-4" style = "display: grid; place-items: center">
+                {% if texts is defined and texts|length > 0 %}
+                    <canvas id="pie_1"></canvas>
+                {% else %}
+                    <div style = "display: grid; place-items: center;">
+                        <h6>Please add new transactions to see the analysis!</h6>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
