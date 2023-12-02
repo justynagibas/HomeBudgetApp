@@ -4,10 +4,10 @@ function pie_chart(div_id, data, labels){
     new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: labels,
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                label: ' Amount spent: ',
+                data: data,
                 borderWidth: 1
             }]
         },
@@ -17,7 +17,6 @@ function pie_chart(div_id, data, labels){
                     display: false
                 },
             },
-            events: []
         }
     });
 }
@@ -34,14 +33,16 @@ function progress_bar(div_id, percentage, color) {
                     label: 'Done',
                     data: [percentage],
                     backgroundColor: color,
-                    borderWidth: 0,
+                    borderWidth:0,
+                    borderColor: color,
                     borderSkipped: false,
                 },
                 {
                     label: 'Remaining',
                     data: [100 - percentage],
                     backgroundColor: 'rgba(255, 255, 255, 0)',
-                    borderWidth: 0,
+                    borderWidth: 1,
+                    borderColor: color,
                     borderSkipped: false,
                 },
             ],
@@ -50,6 +51,9 @@ function progress_bar(div_id, percentage, color) {
             maintainAspectRatio: false, // Disable the aspect ratio to allow resizing
             responsive: true, // Enable responsiveness
             indexAxis: 'y',
+            animation: {
+                duration: 0
+            },
             scales: {
                 x: {
                     stacked: true,

@@ -1,7 +1,7 @@
 {% extends "main_layout.html" %} {% block content %}
 <div class="row mt-3">
     <div class="col-md-12", style="text-align: center">
-        <h1>App dashboard</h1>
+        <h1><strong>App dashboard</strong></h1>
     </div>
 </div> 
 
@@ -68,7 +68,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6", style="text-align: left">
-                        <h6>Money to be planned for (this amount should be 0 if we planned our money for goals):</h6> 
+                        <h6>Money to be planned for:</h6> 
                     </div>
                     <div class="col-md-6", style="text-align:center">
                         <h6>{{balance_plan}}</h6> 
@@ -119,11 +119,11 @@
         </div>
         <div class="row mt-3">
             <div class="col-md-8" id="catogries_percentages">
-                {% for item in categories %}
+                {% for item in categories_data %}
                 <div>
-                    {{ item|safe }}
+                    {{ item[1]|safe }} : {{item[4]|safe}} %
                     <div>
-                        <canvas id="{{ item|safe }}_bar" style="height: 25px"></canvas>
+                        <canvas id="{{ item[1]|safe }}_bar" style="height: 25px"></canvas>
                     </div>
                 </div> 
                 {% endfor %}
@@ -136,16 +136,28 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        progress_bar("month_progress",{{month_progress}},'green');
-        progress_bar("progress_2",{{already_spent}},"green");
-        pie_chart("pie_1",0,0);
+        progress_bar("month_progress",{{month_progress}},'rgb(176, 196, 222)');
+        progress_bar("progress_2",{{already_spent}},"rgb(176, 196, 222)");
         
-        const categories = {{categories | tojson}};
+        var categories = {{categories_data | tojson}};
+        var pie_labels = new Array();
+        var pie_data = new Array();
+
         for(var i =0 ;i < categories.length;i++){
-            cat_name = categories[i];
+            cat_name = categories[i][1];
             id_name = cat_name + "_bar";
-            progress_bar(id_name,Math.random()*100,'green');
+            var percentage = 0;
+            if(categories[i][2] != 0)
+            {
+                var percentage = categories[i][2]/categories[i][3]*100;
+            }
+            console.log(percentage);
+            progress_bar(id_name,percentage,'rgb(176, 196, 222)');
+            pie_labels.push(cat_name);
+            pie_data.push(categories[i][2]);
         }
+
+        pie_chart("pie_1",pie_data,pie_labels);
    });
 </script>
 
