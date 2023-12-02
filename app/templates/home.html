@@ -1,4 +1,149 @@
 {% extends "main_layout.html" %} {% block content %}
-    <h1>TODO main page</h1>
+<div class="row mt-3">
+    <div class="col-md-12", style="text-align: center">
+        <h1>App dashboard</h1>
+    </div>
+</div> 
+
+<div class="row mt-3" style="margin-left: 50px; margin-right: 50px; height: 500px;">
+    <div class="col-md-6">
+        <div class = "row mt-3">
+            <div class="col-md-12">
+                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
+                    <div class="row mt-1">
+                        <div class="col-md-12" style="text-align: center;">
+                            <h6>Month progress:</h6>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-md-11">
+                            <canvas id="progress_1" style="height: 35px"></canvas>
+                        </div>
+                        <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
+                            100%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class = "row mt-3">
+            <div class="col-md-12">
+                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
+                    <div class="row mt-1">
+                        <div class="col-md-12" style="text-align: center;">
+                            <h6>Amount of monthly budget already spent:</h6>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-md-11">
+                            <canvas id="progress_2" style="height: 35px"></canvas>
+                        </div>
+                        <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
+                            100%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
+                    <div class="row">
+                        <div class="col-md-12", style="text-align: center">
+                            <h3>Monthly budget plan</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6", style="text-align: left">
+                            <h6>Planned incomes:</h6> 
+                        </div>
+                        <div class="col-md-6", style="text-align: center">
+                            <h6>1000.00</h6> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6", style="text-align: left">
+                            <h6>Planned outcomes:</h6> 
+                        </div>
+                        <div class="col-md-6", style="text-align: center">
+                            <h6>1000.00</h6> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6", style="text-align: left">
+                            <h6>Money to be planned for:</h6> 
+                        </div>
+                        <div class="col-md-6", style="text-align: center">
+                            <h6>1000.00</h6> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
+                    <div class="row">
+                        <div class="col-md-12", style="text-align: center">
+                            <h3>Actual budget for this month</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6", style="text-align: left">
+                            <h6>Actual incomes:</h6> 
+                        </div>
+                        <div class="col-md-6", style="text-align: center">
+                            <h6>1000.00</h6> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6", style="text-align: left">
+                            <h6>Actual outcomes:</h6> 
+                        </div>
+                        <div class="col-md-6", style="text-align: center">
+                            <h6>1000.00</h6> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6", style="text-align: left">
+                            <h6>Money left to spend this month:</h6> 
+                        </div>
+                        <div class="col-md-6", style="text-align: center">
+                            <h6>1000.00</h6> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mt-3">
+        <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+            <div class="row" style = "justify-content: center; align-items: center;">
+                <h3>What Your budget was spent on?</h3> 
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    
+                </div>
+                <div class="col-md-6" style = "display: grid; place-items: center; height: 100%;">
+                    <canvas id="pie_1"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+
+
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        progress_bar("progress_1",100,'green');
+        progress_bar("progress_2",100,"green");
+        pie_chart("pie_1",0,0);
+   });
+</script>
 
 {% endblock %}
