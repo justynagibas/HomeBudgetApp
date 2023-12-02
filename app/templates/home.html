@@ -29,7 +29,7 @@
             </div>
             <div class="row mt-3">
                 <div class="col-md-12" style="text-align: center;">
-                    <h4>Amount of monthly budget already spent:</h4>
+                    <h4>Amount of monthly income already spent:</h4>
                 </div>
             </div>
             <div class="row mt-1">
@@ -149,9 +149,12 @@
             var percentage = 0;
             if(categories[i][2] != 0)
             {
-                var percentage = categories[i][2]/categories[i][3]*100;
+                percentage = categories[i][2]/categories[i][3]*100;
+                if(percentage > 100)
+                {
+                    percentage = 100;
+                }
             }
-            console.log(percentage);
             progress_bar(id_name,percentage,'rgb(176, 196, 222)');
             pie_labels.push(cat_name);
             pie_data.push(categories[i][2]);
