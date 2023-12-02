@@ -2,14 +2,25 @@ import sqlalchemy
 
 from app import app, db
 from flask import render_template, redirect, url_for, request, flash
-from app.database import database
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
+from app.routes.dashboard_queries import (
+    get_user_categories,
+    get_user_income_plan,
+    get_user_outcome_plan,
+    get_user_income_actual,
+    get_user_outcome_actual,
+)
 import pandas as pd
+from datetime import datetime, date
+import calendar
 
 from app.routes.forms import AddGoalForm, AddGoalProgress
+
+
+this_date = datetime.now().strftime("%d %B, %Y")
 
 
 @app.route("/")
@@ -23,7 +34,33 @@ def hello():
 
 @app.route("/home")
 def home():
-    return render_template("home.html")
+    percent_of_month = round((date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100)
+
+    user_categories = get_user_categories(current_user.get_id())
+
+    user_income_plan = get_user_income_plan(current_user.get_id())
+    user_outcome_plan = get_user_outcome_plan(current_user.get_id())
+    user_planned_balance = user_income_plan - user_outcome_plan
+
+    user_income_actual = get_user_income_actual(current_user.get_id())
+    user_outcome_actual = get_user_outcome_actual(current_user.get_id())
+    user_actual_balance = user_income_actual - user_outcome_actual
+
+    already_spent_percentage = round(user_actual_balance / user_planned_balance * 100)
+
+    return render_template(
+        "home.html",
+        month_progress=percent_of_month,
+        this_date=this_date,
+        already_spent=already_spent_percentage,
+        categories=user_categories,
+        income_plan=user_income_plan,
+        outcome_plan=user_outcome_plan,
+        balance_plan=user_planned_balance,
+        income_actual=user_income_actual,
+        outcome_actual=user_outcome_actual,
+        balance_actual=user_actual_balance,
+    )
 
 
 @app.route("/signup", methods=["GET", "POST"])

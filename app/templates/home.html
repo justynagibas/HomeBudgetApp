@@ -5,145 +5,149 @@
     </div>
 </div> 
 
-<div class="row mt-3" style="margin-left: 50px; margin-right: 50px; height: 500px;">
-    <div class="col-md-6">
-        <div class = "row mt-3">
-            <div class="col-md-12">
-                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
-                    <div class="row mt-1">
-                        <div class="col-md-12" style="text-align: center;">
-                            <h6>Month progress:</h6>
-                        </div>
-                    </div>
-                    <div class="row mt-1">
-                        <div class="col-md-11">
-                            <canvas id="progress_1" style="height: 35px"></canvas>
-                        </div>
-                        <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
-                            100%
-                        </div>
-                    </div>
+<div class="row mt-3" style="margin-left: 25px; margin-right: 25px;">
+    <div class="col-md-6" style="padding:10px;">
+        <div class="card bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+            <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                <h3>Monthly status</h3>
+            </div>
+            <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                <h4>{{this_date}}</h4> 
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12" style="text-align: center;">
+                    <h4>Month progress:</h4>
                 </div>
             </div>
-        </div>
-        
-        <div class = "row mt-3">
-            <div class="col-md-12">
-                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
-                    <div class="row mt-1">
-                        <div class="col-md-12" style="text-align: center;">
-                            <h6>Amount of monthly budget already spent:</h6>
-                        </div>
-                    </div>
-                    <div class="row mt-1">
-                        <div class="col-md-11">
-                            <canvas id="progress_2" style="height: 35px"></canvas>
-                        </div>
-                        <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
-                            100%
-                        </div>
-                    </div>
+            <div class="row mt-1">
+                <div class="col-md-11">
+                    <canvas id="month_progress" style="height: 25px"></canvas>
+                </div>
+                <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
+                    {{month_progress}}%
                 </div>
             </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12">
-                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
-                    <div class="row">
-                        <div class="col-md-12", style="text-align: center">
-                            <h3>Monthly budget plan</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6", style="text-align: left">
-                            <h6>Planned incomes:</h6> 
-                        </div>
-                        <div class="col-md-6", style="text-align: center">
-                            <h6>1000.00</h6> 
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6", style="text-align: left">
-                            <h6>Planned outcomes:</h6> 
-                        </div>
-                        <div class="col-md-6", style="text-align: center">
-                            <h6>1000.00</h6> 
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6", style="text-align: left">
-                            <h6>Money to be planned for:</h6> 
-                        </div>
-                        <div class="col-md-6", style="text-align: center">
-                            <h6>1000.00</h6> 
-                        </div>
-                    </div>
+            <div class="row mt-3">
+                <div class="col-md-12" style="text-align: center;">
+                    <h4>Amount of monthly budget already spent:</h4>
                 </div>
             </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12">
-                <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px">
-                    <div class="row">
-                        <div class="col-md-12", style="text-align: center">
-                            <h3>Actual budget for this month</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6", style="text-align: left">
-                            <h6>Actual incomes:</h6> 
-                        </div>
-                        <div class="col-md-6", style="text-align: center">
-                            <h6>1000.00</h6> 
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6", style="text-align: left">
-                            <h6>Actual outcomes:</h6> 
-                        </div>
-                        <div class="col-md-6", style="text-align: center">
-                            <h6>1000.00</h6> 
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6", style="text-align: left">
-                            <h6>Money left to spend this month:</h6> 
-                        </div>
-                        <div class="col-md-6", style="text-align: center">
-                            <h6>1000.00</h6> 
-                        </div>
-                    </div>
+            <div class="row mt-1">
+                <div class="col-md-11">
+                    <canvas id="progress_2" style="height: 25px"></canvas>
+                </div>
+                <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
+                    {{already_spent}}%
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 mt-3">
-        <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
-            <div class="row" style = "justify-content: center; align-items: center;">
-                <h3>What Your budget was spent on?</h3> 
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    
+    <div class="col-md-6" style="padding: 0;">
+        <div class="row-md-12" style="height: 50%; padding:10px;">
+            <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+                <div class="row">
+                    <div class="col-md-12", style="text-align: center">
+                        <h3>Monthly budget plan</h3>
+                    </div>
                 </div>
-                <div class="col-md-6" style = "display: grid; place-items: center; height: 100%;">
-                    <canvas id="pie_1"></canvas>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Planned incomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{income_plan}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Planned outcomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{outcome_plan}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Money to be planned for (this amount should be 0 if we planned our money for goals):</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align:center">
+                        <h6>{{balance_plan}}</h6> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row-md-12" style="height: 50%;padding:10px;">
+            <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+                <div class="row">
+                    <div class="col-md-12", style="text-align: center">
+                        <h3>Actual budget for this month</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Actual incomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{income_actual}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Actual outcomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{outcome_actual}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Money left to spend this month:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{balance_actual}}</h6> 
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Table -->
-
-
+<div class="row-md-12 mt-2" style="margin-left: 25px; margin-right: 25px; padding: 10px;">
+    <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+        <div class="row" style = "justify-content: center; align-items: center;">
+            <h3>What was Your budget spent on?</h3> 
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-8" id="catogries_percentages">
+                {% for item in categories %}
+                <div>
+                    {{ item|safe }}
+                    <div>
+                        <canvas id="{{ item|safe }}_bar" style="height: 25px"></canvas>
+                    </div>
+                </div> 
+                {% endfor %}
+            </div>
+            <div class="col-md-4" style = "display: grid; place-items: center; height: 100%;">
+                <canvas id="pie_1"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        progress_bar("progress_1",100,'green');
-        progress_bar("progress_2",100,"green");
+        progress_bar("month_progress",{{month_progress}},'green');
+        progress_bar("progress_2",{{already_spent}},"green");
         pie_chart("pie_1",0,0);
+        
+        const categories = {{categories | tojson}};
+        for(var i =0 ;i < categories.length;i++){
+            cat_name = categories[i];
+            id_name = cat_name + "_bar";
+            progress_bar(id_name,Math.random()*100,'green');
+        }
    });
 </script>
+
 
 {% endblock %}
