@@ -1,0 +1,49 @@
+{% extends "main_layout.html" %} {% block content %}
+    <div class="container text-center">
+        <h1>Your Categories</h1>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-5 offset-md-1">
+            <div class="vertical-div col-md-12">
+                <h2 style="text-align: center;">Categories</h2>
+                <div class="btn-group btn-group-lg col-md-12 m-0 p-0" role="group" aria-label="Categories">
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
+                        <button type="button" class="btn btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Add category</button>
+                    </form>
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
+                      <button type="button" class="btn btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Remove category</button>
+                    </form>
+                    </div>
+                <div class="rounded bg-light p-3">
+
+                    <ul class="list-group list-group-flush">
+                         {% for category in data['category'] %}
+                              <li class="list-group-item">{{ category }}</li>
+                         {% endfor %}
+                     </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 offset-md-1">
+            <div class="vertical-div col-md-12">
+                <h2 style="text-align: center;">Subcategories in {{data['category_name']}}</h2>
+                <div class="btn-group btn-group-lg col-md-12 m-0 p-0"  role="group" aria-label="Subcategories">
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
+                        <button type="button" class="btn  btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Add subcategory</button>
+                    </form>
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
+                      <button type="button" class="btn btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Remove subcategory</button>
+                    </form>
+                    </div>
+                <div class="rounded bg-light p-3">
+                    <ul class="list-group list-group-flush">
+                         {% for category in data['current_subcategory'] %}
+                              <li class="list-group-item">{{ category }}</li>
+                         {% endfor %}
+                     </ul>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
