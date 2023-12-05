@@ -21,8 +21,9 @@ function pie_chart(div_id, data, labels){
     });
 }
 
-function progress_bar(div_id, percentage, color) {
+function progress_bar(div_id, percentage_in, color) {
     const ctx = document.getElementById(div_id).getContext('2d');
+    var percentage = percentage_in <=100 ? percentage_in : 100;
 
     var stackedBarChart = new Chart(ctx, {
         type: 'bar',
