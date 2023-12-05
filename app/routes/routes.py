@@ -44,10 +44,9 @@ def home():
     user_outcome_actual = get_user_outcome_actual(current_user.get_id())
     user_actual_balance = user_income_actual - user_outcome_actual
 
-    already_spent_percentage = round(user_outcome_actual / user_income_actual * 100) if user_planned_balance != 0 else 0
+    already_spent_percentage = round(user_outcome_actual / user_income_actual * 100) if user_income_actual != 0 else 0
 
     user_categories_data = get_categories_data(current_user.get_id())
-    print(user_categories_data)
 
     return render_template(
         "home.html",
@@ -140,7 +139,6 @@ def add_goal_progress():
         return redirect(url_for("hello"))
     form = AddGoalProgress()
     goals = db.session.query(Goals.id, Goals.name).all()
-    print(goals)
     # Update the choices for the dropdown field
     form.name.choices = [(str(goal.id), goal.name) for goal in goals]
 

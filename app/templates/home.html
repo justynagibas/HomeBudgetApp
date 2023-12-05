@@ -125,11 +125,17 @@
                     <div>
                         <canvas id="{{ item[1]|safe }}_bar" style="height: 25px"></canvas>
                     </div>
+                    <div class="row" style="text-align:center">
+                        <div class="col-md-12">
+                            {{ item[2]|safe }} out of {{ item[3]|safe }}
+                        </div>
+                    </div>
+                    
                 </div> 
                 {% endfor %}
             </div>
             <div class="col-md-4" style = "display: grid; place-items: center">
-                {% if texts is defined and texts|length > 0 %}
+                {% if categories_data is defined and categories_data|length > 0 %}
                     <canvas id="pie_1"></canvas>
                 {% else %}
                     <div style = "display: grid; place-items: center;">
@@ -166,7 +172,11 @@
             pie_data.push(categories[i][2]);
         }
 
-        pie_chart("pie_1",pie_data,pie_labels);
+        if(categories.length > 0)
+        {
+            pie_chart("pie_1",pie_data,pie_labels);
+        }
+        
    });
 </script>
 
