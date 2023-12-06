@@ -1,16 +1,27 @@
 from app import app, request, db
 from flask import render_template, redirect, url_for, flash, request
 import sqlalchemy
-from app.database import database
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
 from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
 from app.transaction_tracking.transaction_tracking import get_categories, add_transaction
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
+from app.routes.dashboard_queries import (
+    get_user_income_plan,
+    get_user_outcome_plan,
+    get_user_income_actual,
+    get_user_outcome_actual,
+    get_categories_data,
+)
 import pandas as pd
+from datetime import datetime, date
+import calendar
 
 from app.routes.forms import AddGoalForm, AddGoalProgress
+
+
+this_date = datetime.now().strftime("%d %B, %Y")
 
 
 @app.route("/")
@@ -24,7 +35,33 @@ def hello():
 
 @app.route("/home")
 def home():
-    return render_template("home.html")
+    percent_of_month = round((date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100)
+
+    user_income_plan = get_user_income_plan(current_user.get_id())
+    user_outcome_plan = get_user_outcome_plan(current_user.get_id())
+    user_planned_balance = user_income_plan - user_outcome_plan
+
+    user_income_actual = get_user_income_actual(current_user.get_id())
+    user_outcome_actual = get_user_outcome_actual(current_user.get_id())
+    user_actual_balance = user_income_actual - user_outcome_actual
+
+    already_spent_percentage = round(user_outcome_actual / user_income_actual * 100) if user_income_actual != 0 else 0
+
+    user_categories_data = get_categories_data(current_user.get_id())
+
+    return render_template(
+        "home.html",
+        month_progress=percent_of_month,
+        this_date=this_date,
+        already_spent=already_spent_percentage,
+        income_plan=user_income_plan,
+        outcome_plan=user_outcome_plan,
+        balance_plan=user_planned_balance,
+        income_actual=user_income_actual,
+        outcome_actual=user_outcome_actual,
+        balance_actual=user_actual_balance,
+        categories_data=user_categories_data,
+    )
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -130,7 +167,6 @@ def add_goal_progress():
         return redirect(url_for("hello"))
     form = AddGoalProgress()
     goals = db.session.query(Goals.id, Goals.name).all()
-    print(goals)
     # Update the choices for the dropdown field
     form.name.choices = [(str(goal.id), goal.name) for goal in goals]
 

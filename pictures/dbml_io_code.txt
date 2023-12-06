@@ -1,0 +1,72 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+  id integer [primary key]
+  user_name varchar
+  password varchar
+}
+
+Table groups {
+  id integer [primary key]
+  name varchar
+}
+
+Table user_group {
+  id integer [primary key]
+  user_id integer
+  group_id integer
+}
+
+Table category {
+  id integer [primary key]
+  name varchar
+  user_id integer
+  undeletable boolean
+}
+
+Table subcategory {
+  id integer [primary key]
+  name varchar
+  category_id integer
+}
+
+Table goals {
+  id integer [primary key]
+  name varchar
+  target_amount numeric
+  deadline date
+  user_id integer
+}
+
+Table transactions {
+  id integer [primary key]
+  transaction_date date
+  value numeric
+  category_id integer
+  subcategory_id integer
+  goal_id integer
+  user_id integer
+  user_note varchar
+}
+
+Table budget_plan {
+  id integer [primary key]
+  user_id integer
+  amount numeric
+  category_id integer
+  year integer
+  month integer
+}
+
+Ref: user_group.user_id > users.id
+Ref: user_group.group_id > groups.id
+Ref: category.user_id > users.id 
+Ref: subcategory.category_id > category.id
+Ref: goals.user_id > users.id
+Ref: transactions.category_id > category.id
+Ref: transactions.subcategory_id > subcategory.id
+Ref: transactions.user_id > users.id
+Ref: transactions.goal_id > goals.id
+Ref: budget_plan.user_id > users.id
+Ref: budget_plan.category_id > category.id

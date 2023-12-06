@@ -1,4 +1,184 @@
 {% extends "main_layout.html" %} {% block content %}
-    <h1>TODO main page</h1>
+<div class="row mt-3">
+    <div class="col-md-12", style="text-align: center">
+        <h1><strong>App dashboard</strong></h1>
+    </div>
+</div> 
+
+<div class="row mt-3" style="margin-left: 25px; margin-right: 25px;">
+    <div class="col-md-6" style="padding:10px;">
+        <div class="card bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+            <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                <h3>Monthly status</h3>
+            </div>
+            <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                <h4>{{this_date}}</h4> 
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12" style="text-align: center;">
+                    <h4>Month progress:</h4>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-11">
+                    <canvas id="month_progress" style="height: 25px"></canvas>
+                </div>
+                <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
+                    {{month_progress}}%
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12" style="text-align: center;">
+                    <h4>Amount of monthly income already spent:</h4>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-11">
+                    <canvas id="progress_2" style="height: 25px"></canvas>
+                </div>
+                <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
+                    {{already_spent}}%
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" style="padding: 0;">
+        <div class="row-md-12" style="height: 50%; padding:10px;">
+            <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+                <div class="row">
+                    <div class="col-md-12", style="text-align: center">
+                        <h3>Monthly budget plan</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Planned incomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{income_plan}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Planned outcomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{outcome_plan}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Money to be planned for:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align:center">
+                        <h6>{{balance_plan}}</h6> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row-md-12" style="height: 50%;padding:10px;">
+            <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+                <div class="row">
+                    <div class="col-md-12", style="text-align: center">
+                        <h3>Actual budget for this month</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Actual incomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{income_actual}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Actual outcomes:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{outcome_actual}}</h6> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6", style="text-align: left">
+                        <h6>Money left to spend this month:</h6> 
+                    </div>
+                    <div class="col-md-6", style="text-align: center">
+                        <h6>{{balance_actual}}</h6> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row-md-12 mt-2" style="margin-left: 25px; margin-right: 25px; padding: 10px;">
+    <div class="card d-flex bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+        <div class="row" style = "justify-content: center; align-items: center;">
+            <h3>What was Your budget spent on?</h3> 
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-8" id="catogries_percentages">
+                {% for item in categories_data %}
+                <div>
+                    {{ item[1]|safe }} : {{item[4]|safe}} %
+                    <div>
+                        <canvas id="{{ item[1]|safe }}_bar" style="height: 25px"></canvas>
+                    </div>
+                    <div class="row" style="text-align:center">
+                        <div class="col-md-12">
+                            {{ item[2]|safe }} out of {{ item[3]|safe }}
+                        </div>
+                    </div>
+                    
+                </div> 
+                {% endfor %}
+            </div>
+            <div class="col-md-4" style = "display: grid; place-items: center">
+                {% if categories_data is defined and categories_data|length > 0 %}
+                    <canvas id="pie_1"></canvas>
+                {% else %}
+                    <div style = "display: grid; place-items: center;">
+                        <h6>Please add new transactions to see the analysis!</h6>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        progress_bar("month_progress",{{month_progress}},'rgb(176, 196, 222)');
+        progress_bar("progress_2",{{already_spent}},"rgb(176, 196, 222)");
+        
+        var categories = {{categories_data | tojson}};
+        var pie_labels = new Array();
+        var pie_data = new Array();
+
+        for(var i =0 ;i < categories.length;i++){
+            cat_name = categories[i][1];
+            id_name = cat_name + "_bar";
+            var percentage = 0;
+            if(categories[i][2] != 0)
+            {
+                percentage = categories[i][2]/categories[i][3]*100;
+                if(percentage > 100)
+                {
+                    percentage = 100;
+                }
+            }
+            progress_bar(id_name,percentage,'rgb(176, 196, 222)');
+            pie_labels.push(cat_name);
+            pie_data.push(categories[i][2]);
+        }
+
+        if(categories.length > 0)
+        {
+            pie_chart("pie_1",pie_data,pie_labels);
+        }
+        
+   });
+</script>
+
 
 {% endblock %}
