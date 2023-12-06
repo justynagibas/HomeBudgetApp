@@ -1,0 +1,185 @@
+{% extends "main_layout.html" %}
+{% block content %}
+    <div class="container text-center">
+        <h1>Transaction tracking</h1>
+    </div>
+
+    <div class="row justify-content-between" style="margin-top: 200px">
+        <div class="col-lg-4 text-center">
+            <div class="vertical-div">
+                <button type="submit" class="btn btn-primary" style="scale:3.5" data-toggle="modal" data-target="#modal-income">Add income</button>
+            </div>
+        </div>
+        <div class="col-lg-4 text-center">
+            <div class="vertical-div">
+                <button type="submit" class="btn btn-primary" style="scale:3.5" data-toggle="modal" data-target="#modal-outcome">Add outcome</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal show" id="modal-outcome" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Add outcome</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" novalidate>
+                        {{ form_outcome.hidden_tag() }}
+                        <div class="form-group">
+                            <label for="name">Note:</label>
+                            {% if form_outcome.note.errors %}
+                                {{ form_outcome.note(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.note.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.note(class="form-control", type="text") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Value:</label>
+                            {% if form_outcome.value.errors %}
+                                {{ form_outcome.value(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.value.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.value(class="form-control", type="number") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Date:</label>
+                            {% if form_outcome.date.errors %}
+                                {{ form_outcome.date(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.date.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.date(class="form-control", type="date") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Main category:</label>
+                            {% if form_outcome.main_category.errors %}
+                                {{ form_outcome.main_category(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.main_category.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.main_category(class="form-control", id="main-category") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Subcategory:</label>
+                            {% if form_outcome.subcategory.errors %}
+                                {{ form_outcome.subcategory(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.subcategory.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.subcategory(class="form-control", id="sub-category") }}
+                            {% endif %}
+                        </div>
+                        {{ form_outcome.submit(class="btn btn-primary btn-block", id="submit-outcome")}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal show" id="modal-income" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Add income</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" novalidate>
+                        {{ form_income.hidden_tag() }}
+                        <div class="form-group">
+                            <label for="name">Note:</label>
+                            {% if form_income.note.errors %}
+                                {{ form_income.note(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_income.note.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_income.note(class="form-control", type="text") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Value:</label>
+                            {% if form_income.value.errors %}
+                                {{ form_income.value(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_income.value.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_income.value(class="form-control", type="number") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Date:</label>
+                            {% if form_income.date.errors %}
+                                {{ form_income.date(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_income.date.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_income.date(class="form-control", type="date") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Subcategory:</label>
+                            {% if form_income.subcategory.errors %}
+                                {{ form_income.subcategory(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_income.subcategory.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_income.subcategory(class="form-control", id="subcategory") }}
+                            {% endif %}
+                        </div>
+                        {{ form_income.submit(class="btn btn-primary btn-block", id="submit-income" )}}
+                    </form>
+                </div>
+            </div>
+        </div>
+</div>
+{% if form_outcome.errors %}
+    <script>
+    $('#modal-outcome').modal('show');
+    </script>
+{% endif %}
+
+{% if form_income.errors %}
+    <script>
+    $('#modal-income').modal('show');
+    </script>
+{% endif %}
+{% endblock %}

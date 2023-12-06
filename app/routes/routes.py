@@ -1,10 +1,11 @@
+from app import app, request, db
+from flask import render_template, redirect, url_for, flash, request
 import sqlalchemy
-
-from app import app, db
-from flask import render_template, redirect, url_for, request, flash
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
+from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
+from app.transaction_tracking.transaction_tracking import get_categories, add_transaction
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
     get_user_income_plan,
@@ -112,6 +113,33 @@ def about():
 def tutorial():
     return render_template("tutorial.html")
 
+@app.route("/transaction_tracking", methods=["GET", "POST"])
+def transaction_tracking():
+    if current_user.is_authenticated:
+        form_outcome = OutcomeForm(prefix='outcome')
+        main_cat_out, sub_cat = get_categories(current_user.id, 'outcome')
+        form_outcome.main_category.choices += [cat[0] for cat in main_cat_out]
+        form_outcome.subcategory.choices += [cat[0] for cat in sub_cat]
+        form_income = IncomeForm(prefix='income')
+        subcat_in = get_categories(current_user.id, 'income')
+        form_income.subcategory.choices += [cat[0] for cat in subcat_in]
+        if request.method == 'POST':
+            if form_outcome.submit.data:
+                if form_outcome.validate():
+                    add_transaction(form_outcome,current_user.id, "outcome")
+                    flash("Outcome added successfully!", 'success')
+                    return redirect(url_for("transaction_tracking"))
+            elif form_income.submit.data:
+                if form_income.validate():
+                    add_transaction(form_income, current_user.id, "income")
+                    flash("Income added successfully!", 'success')
+                    return redirect(url_for("transaction_tracking"))
+        return render_template("transaction_tracking.html", form_outcome=form_outcome, form_income=form_income)
+
+    else:
+        flash("First create account or log in if you have one!")
+        return redirect(url_for("login"))
+
 
 @app.route("/addgoal", methods=["GET", "POST"])
 def goals():
@@ -155,12 +183,6 @@ def add_goal_progress():
         flash(f"Goal Progress has been added", "success")
         return render_template("addgoalprogress.html", form=form)
     return render_template("addgoalprogress.html", form=form)
-
-
-def insert_goal(name, target_amount, deadline, user_id):
-    goal = Goals(name=name, target_amount=target_amount, deadline=deadline, user_id=user_id)
-    db.session.add(goal)
-    db.session.commit()
 
 
 @app.route("/showgoals", methods=["GET", "POST"])

@@ -40,6 +40,7 @@
           <a class="nav-item nav-link" id="addgoalprogress" href="/addgoalprogress">add goal progress</a>
           <a class="nav-item nav-link" id="showgoals" href="/showgoals">show goals</a>
           <a class="nav-item nav-link" id="showtransactions" href="/showtransactions">show transactions</a>
+          <a class="nav-item nav-link" id="addtransactions" href="/transaction_tracking">Add Transaction</a>
           {% else %}
           <a class="nav-item nav-link" id="login" href="/login">Login</a>
           <a class="nav-item nav-link" id="signUp" href="/signup">Sign Up</a>
@@ -65,7 +66,6 @@
     </div>
     {% endif %} {% endfor %} {% endif %} {% endwith %}
 
-    <div class="container-fluid">{% block content %} {% endblock %}</div>
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
       integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -83,5 +83,6 @@
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../static/charts.js"></script>
+    <div class="container">{% block content %} {% endblock %}</div>
   </body>
 </html>
