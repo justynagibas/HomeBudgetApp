@@ -20,6 +20,8 @@ def add_transaction(form, userID, transaction_type):
     subcategory_id = db.session.query(Subcategory.id).filter(Subcategory.name == form.subcategory.data).all()
     if not subcategory_id:
         subcategory_id = None
+    else:
+        subcategory_id = subcategory_id[0][0]
     record = Transactions(transaction_date = form.date.data, value=form.value.data, subcategory_id=subcategory_id, user_id=userID, user_note=form.note.data)
     if transaction_type == "income":
         record.category_id = db.session.query(Category.id).filter(Category.name=="Income").all()[0][0]
