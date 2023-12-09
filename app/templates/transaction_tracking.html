@@ -162,7 +162,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form_income.subcategory(class="form-control", id="subcategory") }}
+                                {{ form_income.subcategory(class="form-control", id="income-subcategory") }}
                             {% endif %}
                         </div>
                         {{ form_income.submit(class="btn btn-primary btn-block", id="submit-income" )}}
@@ -182,4 +182,36 @@
     $('#modal-income').modal('show');
     </script>
 {% endif %}
+<script>
+    // Dont know how this shiet works
+    $(document).ready(function() {
+        $('#main-category').change(function() {
+            // Get the selected value
+            var selectedValue = $(this).val();
+            console.log('Selected Value:', selectedValue);
+            // Make an AJAX request to fetch the new options for the second field
+            $.ajax({
+                url: '/get_second_field_options',  // Update the URL to match your Flask route
+                method: 'POST',
+                data: { selected_value: selectedValue },
+                dataType: 'json',
+                success: function(data) {
+                    // Get the SelectField you want to update
+                    var subCategoryField = $('#sub-category');
+
+                    // Clear existing options
+                    subCategoryField.empty();
+
+                    // Add new options based on the data from the server
+                    for (var i = 0; i < data.length; i++) {
+                        subCategoryField.append($('<option>', {
+                            value: data[i],
+                            text: data[i]
+                        }));
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

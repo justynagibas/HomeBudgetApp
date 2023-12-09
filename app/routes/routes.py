@@ -1,5 +1,5 @@
 from app import app, request, db
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, jsonify
 import sqlalchemy
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
@@ -117,9 +117,10 @@ def tutorial():
 def transaction_tracking():
     if current_user.is_authenticated:
         form_outcome = OutcomeForm(prefix='outcome')
-        main_cat_out, sub_cat = get_categories(current_user.id, 'outcome')
-        form_outcome.main_category.choices += [cat[0] for cat in main_cat_out]
-        form_outcome.subcategory.choices += [cat[0] for cat in sub_cat]
+        out_cat_dict = get_categories(current_user.id, 'outcome')
+        form_outcome.main_category.choices += [cat for cat in out_cat_dict.keys()]
+        selected_cat = form_outcome.main_category.data if form_outcome.main_category.data else "Food"
+        form_outcome.subcategory.choices += [subcat for subcat in out_cat_dict.get(selected_cat,[])]
         form_income = IncomeForm(prefix='income')
         subcat_in = get_categories(current_user.id, 'income')
         form_income.subcategory.choices += [cat[0] for cat in subcat_in]
@@ -140,6 +141,17 @@ def transaction_tracking():
         flash("First create account or log in if you have one!")
         return redirect(url_for("login"))
 
+@app.route('/get_second_field_options', methods=['POST'])
+def get_second_field_options():
+    selected_cat = request.form.get('selected_value')
+
+    # Use the selected value to determine the new options for the second field
+    # Replace this logic with your own based on your requirements
+    out_cat_dict = get_categories(current_user.id, 'outcome')
+    subcategory_choices = [subcat for subcat in out_cat_dict.get(selected_cat, [])]
+
+    # Return the new options as JSON
+    return jsonify(subcategory_choices)
 
 @app.route("/addgoal", methods=["GET", "POST"])
 def goals():
