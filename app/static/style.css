@@ -1,3 +1,14 @@
 .top-buffer { margin-top:20px; }
 
 .bg-main { background-color: rgb(141, 209, 201)}
+
+.transaction-table.table-bordered > thead > tr > th{
+    border:1px solid #e0e0e0;
+}
+.transaction-table.table-bordered > tbody > tr > td{
+    border:1px solid #e0e0e0;
+}
+
+.transaction-table.table-bordered > tbody > tr > th{
+    border:1px solid #e0e0e0;
+}

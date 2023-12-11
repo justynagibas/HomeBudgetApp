@@ -17,16 +17,25 @@ def get_categories(userId, category_type):
 
 
 def add_transaction(form, userID, transaction_type):
-    subcategory_id = db.session.query(Subcategory.id).filter(Subcategory.name == form.subcategory.data).all()
-    if not subcategory_id:
-        subcategory_id = None
-    else:
-        subcategory_id = subcategory_id[0][0]
-    record = Transactions(transaction_date = form.date.data, value=form.value.data, subcategory_id=subcategory_id, user_id=userID, user_note=form.note.data)
+    record = Transactions(transaction_date = form.date.data, value=form.value.data, user_id=userID, user_note=form.note.data)
     if transaction_type == "income":
-        record.category_id = db.session.query(Category.id).filter(Category.name=="Income").all()[0][0]
+        record.category_id = db.session.query(Category.id).filter(Category.name=="Income", Category.user_id==userID).all()[0][0]
     elif transaction_type == "outcome":
-        record.category_id = db.session.query(Category.id).filter(Category.name == form.main_category.data).all()[0][0]
+        record.category_id = db.session.query(Category.id).filter(Category.name == form.main_category.data, Category.user_id==userID).all()[0][0]
 
+    subcategory_id = db.session.query(Subcategory.id).filter(Subcategory.name == form.subcategory.data, Subcategory.category_id == record.category_id).all()
+    if not subcategory_id:
+        record.subcategory_id = None
+    else:
+        record.subcategory_id = subcategory_id[0][0]
     db.session.add(record)
     db.session.commit()
+
+def get_transactions(userId):
+    return db.session.query(
+        Transactions.transaction_date,
+        Transactions.value,
+        Category.name,
+        Subcategory.name.label('subcategory_name'),
+        Transactions.user_note
+    ).join(Category, Transactions.category_id == Category.id).outerjoin(Subcategory, Transactions.subcategory_id == Subcategory.id).filter(Transactions.user_id == userId).all()

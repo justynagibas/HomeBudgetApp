@@ -5,7 +5,7 @@ from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
 from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
-from app.transaction_tracking.transaction_tracking import get_categories, add_transaction
+from app.transaction_tracking.transaction_tracking import get_categories, add_transaction, get_transactions
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
     get_user_income_plan,
@@ -116,7 +116,12 @@ def tutorial():
 @app.route("/transaction_tracking", methods=["GET", "POST"])
 def transaction_tracking():
     if current_user.is_authenticated:
+        results = get_transactions(current_user.id)
+        # Convert to Pandas DataFrame
+        df = pd.DataFrame(results)
         form_outcome = OutcomeForm(prefix='outcome')
+        # col_names = ['transaction_date', 'value', 'name', 'subcategory_name', 'user_note'] if not df.empty else []
+        # df.columns = col_names
         out_cat_dict = get_categories(current_user.id, 'outcome')
         form_outcome.main_category.choices += [cat for cat in out_cat_dict.keys()]
         selected_cat = form_outcome.main_category.data if form_outcome.main_category.data else "Food"
@@ -135,7 +140,7 @@ def transaction_tracking():
                     add_transaction(form_income, current_user.id, "income")
                     flash("Income added successfully!", 'success')
                     return redirect(url_for("transaction_tracking"))
-        return render_template("transaction_tracking.html", form_outcome=form_outcome, form_income=form_income)
+        return render_template("transaction_tracking.html", form_outcome=form_outcome, form_income=form_income, transactions=df)
 
     else:
         flash("First create account or log in if you have one!")
@@ -220,22 +225,3 @@ def show_goals():
     return new_df.to_html()
 
 
-@app.route("/showtransactions", methods=["GET", "POST"])
-def show_transactions():
-    if not current_user.is_authenticated:
-        flash("You need to log in")
-        return redirect(url_for("hello"))
-    results = db.session.query(
-        Transactions.id,
-        Transactions.transaction_date,
-        Transactions.value,
-        Transactions.category_id,
-        Transactions.subcategory_id,
-        Transactions.goal_id,
-        Transactions.user_id,
-        Transactions.user_note,
-    )
-
-    # Convert to Pandas DataFrame
-    df = pd.DataFrame(results)
-    return df.to_html()
