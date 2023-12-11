@@ -10,6 +10,7 @@ class OutcomeForm(FlaskForm):
     main_category = SelectField("Main category:", choices=[], validators=[InputRequired(), Length(max=100)])
     subcategory = SelectField("Subcategory:", choices=[], validators=[Length(max=100), Optional()],)
     submit = SubmitField("Submit")
+    
 class IncomeForm(FlaskForm):
 
     note = StringField("Note:", validators=[DataRequired(), Length(max=100)])

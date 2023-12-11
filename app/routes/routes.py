@@ -120,8 +120,6 @@ def transaction_tracking():
         # Convert to Pandas DataFrame
         df = pd.DataFrame(results)
         form_outcome = OutcomeForm(prefix='outcome')
-        # col_names = ['transaction_date', 'value', 'name', 'subcategory_name', 'user_note'] if not df.empty else []
-        # df.columns = col_names
         out_cat_dict = get_categories(current_user.id, 'outcome')
         form_outcome.main_category.choices += [cat for cat in out_cat_dict.keys()]
         selected_cat = form_outcome.main_category.data if form_outcome.main_category.data else "Food"
