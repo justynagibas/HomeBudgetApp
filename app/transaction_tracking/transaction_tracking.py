@@ -1,7 +1,7 @@
 from app import db
 from app.database.database import Users, Groups, Category, Subcategory, Transactions
 
-def get_categories(userId, category_type):
+def get_transaction_categories(userId, category_type):
     if category_type == "income":
         user_income_categories = db.session.query(Subcategory.name).join(Category).filter(Category.user_id==userId, Category.name=="Income").all()
         return user_income_categories

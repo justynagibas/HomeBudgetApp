@@ -5,7 +5,7 @@ from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
 from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
-from app.transaction_tracking.transaction_tracking import get_categories, add_transaction, get_transactions
+from app.transaction_tracking.transaction_tracking import get_transaction_categories, add_transaction, get_transactions
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
     get_user_income_plan,
@@ -120,12 +120,12 @@ def transaction_tracking():
         # Convert to Pandas DataFrame
         df = pd.DataFrame(results)
         form_outcome = OutcomeForm(prefix='outcome')
-        out_cat_dict = get_categories(current_user.id, 'outcome')
+        out_cat_dict = get_transaction_categories(current_user.id, 'outcome')
         form_outcome.main_category.choices += [cat for cat in out_cat_dict.keys()]
         selected_cat = form_outcome.main_category.data if form_outcome.main_category.data else "Food"
         form_outcome.subcategory.choices += [subcat for subcat in out_cat_dict.get(selected_cat,[])]
         form_income = IncomeForm(prefix='income')
-        subcat_in = get_categories(current_user.id, 'income')
+        subcat_in = get_transaction_categories(current_user.id, 'income')
         form_income.subcategory.choices += [cat[0] for cat in subcat_in]
         if request.method == 'POST':
             if form_outcome.submit.data:
@@ -150,7 +150,7 @@ def get_second_field_options():
 
     # Use the selected value to determine the new options for the second field
     # Replace this logic with your own based on your requirements
-    out_cat_dict = get_categories(current_user.id, 'outcome')
+    out_cat_dict = get_transaction_categories(current_user.id, 'outcome')
     subcategory_choices = [subcat for subcat in out_cat_dict.get(selected_cat, [])]
 
     # Return the new options as JSON
