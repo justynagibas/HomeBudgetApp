@@ -39,8 +39,7 @@
           <a class="nav-item nav-link" id="addgoal" href="/addgoal">add goal</a>
           <a class="nav-item nav-link" id="addgoalprogress" href="/addgoalprogress">add goal progress</a>
           <a class="nav-item nav-link" id="showgoals" href="/showgoals">show goals</a>
-          <a class="nav-item nav-link" id="showtransactions" href="/showtransactions">show transactions</a>
-          <a class="nav-item nav-link" id="addtransactions" href="/transaction_tracking">Add Transaction</a>
+          <a class="nav-item nav-link" id="transactions" href="/transaction_tracking">Transactions</a>
           {% else %}
           <a class="nav-item nav-link" id="login" href="/login">Login</a>
           <a class="nav-item nav-link" id="signUp" href="/signup">Sign Up</a>
@@ -67,9 +66,7 @@
     {% endif %} {% endfor %} {% endif %} {% endwith %}
 
     <script
-      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-      crossorigin="anonymous"
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"
     ></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"

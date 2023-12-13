@@ -1,28 +1,63 @@
 {% extends "main_layout.html" %}
 {% block content %}
-    <div class="container text-center">
-        <h1>Transaction tracking</h1>
-    </div>
-
-    <div class="row justify-content-between" style="margin-top: 200px">
-        <div class="col-lg-4 text-center">
-            <div class="vertical-div">
-                <button type="submit" class="btn btn-primary" style="scale:3.5" data-toggle="modal" data-target="#modal-income">Add income</button>
-            </div>
-        </div>
-        <div class="col-lg-4 text-center">
-            <div class="vertical-div">
-                <button type="submit" class="btn btn-primary" style="scale:3.5" data-toggle="modal" data-target="#modal-outcome">Add outcome</button>
-            </div>
+    <div class="row mt-3">
+        <div class="col-md-12", style="text-align: center">
+            <h1><strong>Transactions management</strong></h1>
         </div>
     </div>
 
+    <div class="row justify-content-between mt-5">
+        <div class="col-md-6 text-center">
+            <div class="vertical-div">
+                <button type="submit" class="btn btn-lg btn-dark btn-outline-light btn-block d-flex justify-content-center"  data-toggle="modal" data-target="#modal-income">Add income</button>
+            </div>
+
+        </div>
+        <div class="col-md-6 text-center">
+            <div class="vertical-div">
+                <button type="submit" class="btn btn-lg btn-dark btn-outline-light btn-block d-flex justify-content-center"   data-toggle="modal" data-target="#modal-outcome">Add outcome</button>
+            </div>
+        </div>
+    </div>
+
+  <div class="table-responsive card mt-4">
+        <table class="table table-dark table-striped mb-0 transaction-table table-bordered">
+            <thead>
+                <tr>
+                   <th colspan="6" class="text-center"><h3>Transactions </h3></th>
+                </tr>
+                <tr>
+                   <th scope="col" class="text-center">Lp.</th>
+                   <th scope="col" class="text-center">Category</th>
+                   <th scope="col" class="text-center">Subcategory</th>
+                   <th scope="col" class="text-center">Date</th>
+                   <th scope="col" class="text-center">Value</th>
+                   <th scope="col" class="text-center">Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%  if not transactions.empty %}
+                    {% for index, transaction in transactions.iterrows() %}
+                        <tr>
+                            <td>{{ index }}</td>
+                            <td>{{ transaction['name'] }}</td>
+                            <td>{{ transaction['subcategory_name'] }}</td>
+                            <td>{{ transaction['transaction_date'] }}</td>
+                            <td>{{ transaction['value'] }}</td>
+                            <td>{{ transaction['user_note'] }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+
+    </div>
     <div class="modal show" id="modal-outcome" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content bg-dark border-0 text-light">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalLabel">Add outcome</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -94,7 +129,7 @@
                                 {{ form_outcome.subcategory(class="form-control", id="sub-category") }}
                             {% endif %}
                         </div>
-                        {{ form_outcome.submit(class="btn btn-primary btn-block", id="submit-outcome")}}
+                        {{ form_outcome.submit(class="btn btn-outline-light btn-block", id="submit-outcome")}}
                     </form>
                 </div>
             </div>
@@ -103,10 +138,10 @@
 
     <div class="modal show" id="modal-income" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content bg-dark border-0 text-light">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalLabel">Add income</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -162,10 +197,10 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form_income.subcategory(class="form-control", id="subcategory") }}
+                                {{ form_income.subcategory(class="form-control", id="income-subcategory") }}
                             {% endif %}
                         </div>
-                        {{ form_income.submit(class="btn btn-primary btn-block", id="submit-income" )}}
+                        {{ form_income.submit(class="btn btn-outline-light btn-block", id="submit-income" )}}
                     </form>
                 </div>
             </div>
@@ -182,4 +217,36 @@
     $('#modal-income').modal('show');
     </script>
 {% endif %}
+<script>
+    // Dont know how this shiet works
+    $(document).ready(function() {
+        $('#main-category').change(function() {
+            // Get the selected value
+            var selectedValue = $(this).val();
+            console.log('Selected Value:', selectedValue);
+            // Make an AJAX request to fetch the new options for the second field
+            $.ajax({
+                url: '/get_second_field_options',  // Update the URL to match your Flask route
+                method: 'POST',
+                data: { selected_value: selectedValue },
+                dataType: 'json',
+                success: function(data) {
+                    // Get the SelectField you want to update
+                    var subCategoryField = $('#sub-category');
+
+                    // Clear existing options
+                    subCategoryField.empty();
+
+                    // Add new options based on the data from the server
+                    for (var i = 0; i < data.length; i++) {
+                        subCategoryField.append($('<option>', {
+                            value: data[i],
+                            text: data[i]
+                        }));
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
