@@ -6,6 +6,8 @@ from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
 from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
 from app.transaction_tracking.transaction_tracking import get_transaction_categories, add_transaction, get_transactions
+from app.category.manage_category import add_category, add_subcategory, remove_category,remove_subcategory, get_subcategories, get_categories
+from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
     get_user_income_plan,
@@ -223,3 +225,50 @@ def show_goals():
     return new_df.to_html()
 
 
+@app.route("/categories", methods=["GET", "POST"])
+def category_page():
+    add_category_form = AddCategoryForm('addcat')
+    remove_category_form = RemoveCategoryForm('remcat')
+    add_subcategory_form = AddSubcategoryForm('addsubcat')
+    remove_subcategory_form = RemoveSubcategoryForm('remsubcat')
+    categories = get_categories()
+    if request.method == 'POST':
+        if add_category_form.submit.data:
+            if add_category_form.validate():
+                message, status = add_category(add_category_form.category_name.data)
+                flash(message, status)
+                return redirect(url_for("category_page"))
+        if remove_category_form.submit.data:
+            if remove_category_form.validate():
+                message, status = remove_category(remove_category_form.category_name.data)
+                flash(message, status)
+                return redirect(url_for("category_page"))
+            if add_subcategory_form.submit.data:
+                if add_category_form.validate():
+                    message, status = add_subcategory(add_category_form.category_name.data,
+                                                      add_subcategory_form.subcategory_name.data)
+                    flash(message, status)
+                    return redirect(url_for("category_page"))
+                if remove_subcategory_form.submit.data:
+                    if remove_subcategory_form.validate():
+                        message, status = remove_subcategory(remove_subcategory_form.category_name.data,
+                                                             remove_subcategory_form.subcategory_name.data)
+                        flash(message, status)
+                        return redirect(url_for("category_page"))
+    return render_template("category.html", data=categories, add_category_form=add_category_form,
+                    add_subcategory_form=add_subcategory_form, remove_categgory_form=remove_category_form,
+                    remove_subcategory_form=remove_subcategory_form)
+
+
+
+
+@app.route('/get_subcategory_field_options', methods=['POST'])
+def get_subcategory_field_options():
+    selected_cat = request.form.get('selected_value')
+
+    # Use the selected value to determine the new options for the second field
+    # Replace this logic with your own based on your requirements
+    subcategory_choices = get_subcategories(selected_cat)
+
+    # Return the new options as JSON
+    return jsonify(subcategory_choices)

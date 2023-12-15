@@ -17,7 +17,7 @@
                 <div class="rounded bg-dark p-3">
 
                     <ul class="list-group bg-dark">
-                         {% for category in data['category'] %}
+                         {% for category in data %}
                               <li class="list-group-item">{{ category }}</li>
                          {% endfor %}
                      </ul>
@@ -28,7 +28,7 @@
             <div class="vertical-div col-md-12">
                 <h2 style="text-align: center;">Subcategories in {{data['category_name']}}</h2>
                 <select class="form-select form-control bg-dark text-white col-md-6 offset-md-3" aria-label="Category select" id="category-select" onchange="updateHiddenField()">
-                    {% for category in data['category'] %}
+                    {% for category in data %}
                           <option value="{{category}}">{{ category }}</option>
                     {% endfor %}
                 </select>
