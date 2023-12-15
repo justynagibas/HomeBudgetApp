@@ -7,16 +7,16 @@
             <div class="vertical-div col-md-12">
                 <h2 style="text-align: center;">Categories</h2>
                 <div class="btn-group btn-group-lg col-md-12 m-0 p-0" role="group" aria-label="Categories">
-                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
-                        <button type="button" class="btn btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Add category</button>
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category_page") }}" method="POST">
+                        <button type="button" class="btn btn-lg btn-dark btn-outline-light flex-grow-1" style="font-size:1.2vw" data-toggle="modal" data-target="#modal-addcat">Add category</button>
                     </form>
-                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
-                      <button type="button" class="btn btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Remove category</button>
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category_page") }}" method="POST">
+                      <button type="button" class="btn btn-dark btn-outline-light btn-lg flex-grow-1" style="font-size:1.2vw" data-toggle="modal" data-target="#modal-remcat">Remove category</button>
                     </form>
                     </div>
-                <div class="rounded bg-light p-3">
+                <div class="rounded bg-dark p-3">
 
-                    <ul class="list-group list-group-flush">
+                    <ul class="list-group bg-dark">
                          {% for category in data['category'] %}
                               <li class="list-group-item">{{ category }}</li>
                          {% endfor %}
@@ -27,23 +27,216 @@
         <div class="col-md-5 offset-md-1">
             <div class="vertical-div col-md-12">
                 <h2 style="text-align: center;">Subcategories in {{data['category_name']}}</h2>
+                <select class="form-select form-control bg-dark text-white col-md-6 offset-md-3" aria-label="Category select" id="category-select" onchange="updateHiddenField()">
+                    {% for category in data['category'] %}
+                          <option value="{{category}}">{{ category }}</option>
+                    {% endfor %}
+                </select>
                 <div class="btn-group btn-group-lg col-md-12 m-0 p-0"  role="group" aria-label="Subcategories">
-                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
-                        <button type="button" class="btn  btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Add subcategory</button>
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category_page") }}" method="POST">
+                        <button type="button" class="btn  btn-secondary btn-lg  btn-dark btn-outline-light flex-grow-1" style="font-size:1.2vw" data-toggle="modal" data-target="#modal-addsubcat">Add subcategory</button>
                     </form>
-                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category") }}" method="POST">
-                      <button type="button" class="btn btn-secondary btn-lg flex-grow-1" style="font-size:1.2vw">Remove subcategory</button>
+                    <form class="col-md d-flex m-0 p-0" action="{{ url_for("category_page") }}" method="POST">
+                      <button type="button" class="btn btn-secondary btn-lg btn-dark btn-outline-light flex-grow-1" style="font-size:1.2vw" data-toggle="modal" data-target="#modal-remsubcat">Remove subcategory</button>
                     </form>
                     </div>
-                <div class="rounded bg-light p-3">
-                    <ul class="list-group list-group-flush">
-                         {% for category in data['current_subcategory'] %}
-                              <li class="list-group-item">{{ category }}</li>
-                         {% endfor %}
+                <div class="rounded bg-dark p-3">
+                    <ul class="list-group " id="subcategory-list">
                      </ul>
                 </div>
             </div>
             </div>
         </div>
     </div>
+        <div class="modal show" id="modal-addcat" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-dark border-0 text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Add category</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" novalidate>
+                        {{ add_category_form.hidden_tag() }}
+                        <div class="form-group">
+                            <label for="category_name">Category name:</label>
+                            {% if add_category_form.category_name.errors %}
+                                {{ add_category_form.category_name(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in add_category_form.category_name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ add_category_form.category_name(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        {{ add_category_form.submit(class="btn btn-outline-light btn-block", id="add-category")}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="modal show" id="modal-remcat" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-dark border-0 text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Remove category</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" novalidate>
+                        {{ remove_categgory_form.hidden_tag() }}
+                        <div class="form-group">
+                            <label for="category_name">Category name:</label>
+                            {% if remove_categgory_form.category_name.errors %}
+                                {{ remove_categgory_form.category_name(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in remove_categgory_form.category_name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ remove_categgory_form.category_name(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        {{ remove_categgory_form.submit(class="btn btn-outline-light btn-block", id="remove-category")}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="modal show" id="modal-addsubcat" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-dark border-0 text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Add subcategory</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" novalidate>
+                        {{ add_subcategory_form.csrf_token() }}
+                        {{ add_subcategory_form.category_name(id="add-subcat-form") }}
+                        <div class="form-group">
+                            <label for="category_name">Subcategory name:</label>
+                            {% if add_subcategory_form.subcategory_name.errors %}
+                                {{ add_category_form.csubategory_name(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in add_subcategory_form.subcategory_name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ add_subcategory_form.subcategory_name(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        {{ add_subcategory_form.submit(class="btn btn-outline-light btn-block", id="add-subcategory")}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="modal show" id="modal-remsubcat" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-dark border-0 text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Remove subcategory</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" novalidate>
+                        {{ remove_subcategory_form.csrf_token() }}
+                        {{ remove_subcategory_form.category_name(id="rem-subcat-form") }}
+                        <div class="form-group">
+                            <label for="category_name">Subcategory name:</label>
+                            {% if remove_subcategory_form.subcategory_name.errors %}
+                                {{ remove_subcategory_form.subcategory_name(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in remove_subcategory_form.subcategory_name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ remove_subcategory_form.subcategory_name(class="form-control", id="rem-subcat-field") }}
+                            {% endif %}
+                        </div>
+                        {{ remove_subcategory_form.submit(class="btn btn-outline-light btn-block", id="remove-subcategory")}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if add_category_form.errors %}
+    <script>
+    $('#modal-addcat').modal('show');
+    </script>
+{% endif %}
+
+{% if remove_categgory_form.errors %}
+    <script>
+    $('#modal-remcat').modal('show');
+    </script>
+{% endif %}
+        {% if add_subcategory_form.errors %}
+    <script>
+    $('#modal-addsubcat').modal('show');
+    </script>
+{% endif %}
+
+{% if remove_subcategory_form.errors %}
+    <script>
+    $('#modal-remsubcat').modal('show');
+    </script>
+{% endif %}
+    <script>
+    // Dont know how this shiet works
+    $(document).ready(function() {
+        $('#category-select').change(function() {
+            // Get the selected value
+            var selectedValue = $(this).val();
+            console.log('Selected Value:', selectedValue);
+            // Make an AJAX request to fetch the new options for the second field
+            $.ajax({
+                url: '/get_subcategory_field_options',  // Update the URL to match your Flask route
+                method: 'POST',
+                data: { selected_value: selectedValue },
+                dataType: 'json',
+                success: function(data) {
+                    // Get the SelectField you want to update
+                    var subCategoryList = $('#subcategory-list');
+                    var subCategoryField = $('#rem-subcat-field');
+                    // Clear existing options
+                    subCategoryList.empty();
+                    subCategoryField.empty();
+
+                    // Add new options based on the data from the server
+                    for (var i = 0; i < data.length; i++) {
+                        subCategoryList.append($('<li>', {
+                            class: "list-group-item"
+                        }).text(data[i]));
+                        subCategoryField.append($('<option>', {
+                            value: data[i],
+                            text: data[i]
+                        }));
+                    }
+                }
+            });
+        });
+    });
+</script>
+<script>
+    function updateHiddenField() {
+        var selectedOption = document.getElementById('category-select').value;
+        $('#add-subcat-form').val(selectedOption);
+        $('#rem-subcat-form').val(selectedOption);
+    }
+</script>
 {% endblock %}
