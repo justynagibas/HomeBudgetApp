@@ -227,11 +227,12 @@ def show_goals():
 
 @app.route("/categories", methods=["GET", "POST"])
 def category_page():
-    add_category_form = AddCategoryForm('addcat')
-    remove_category_form = RemoveCategoryForm('remcat')
-    add_subcategory_form = AddSubcategoryForm('addsubcat')
-    remove_subcategory_form = RemoveSubcategoryForm('remsubcat')
     categories = get_categories()
+    add_category_form = AddCategoryForm(prefix='addcat')
+    remove_category_form = RemoveCategoryForm(prefix='remcat')
+    add_subcategory_form = AddSubcategoryForm(prefix='addsubcat')
+    remove_subcategory_form = RemoveSubcategoryForm(prefix='remsubcat')
+    remove_category_form.category_name.choices=categories
     if request.method == 'POST':
         if add_category_form.submit.data:
             if add_category_form.validate():
@@ -243,18 +244,18 @@ def category_page():
                 message, status = remove_category(remove_category_form.category_name.data)
                 flash(message, status)
                 return redirect(url_for("category_page"))
-            if add_subcategory_form.submit.data:
-                if add_category_form.validate():
-                    message, status = add_subcategory(add_category_form.category_name.data,
-                                                      add_subcategory_form.subcategory_name.data)
-                    flash(message, status)
-                    return redirect(url_for("category_page"))
-                if remove_subcategory_form.submit.data:
-                    if remove_subcategory_form.validate():
-                        message, status = remove_subcategory(remove_subcategory_form.category_name.data,
-                                                             remove_subcategory_form.subcategory_name.data)
-                        flash(message, status)
-                        return redirect(url_for("category_page"))
+        if add_subcategory_form.submit.data:
+            if add_subcategory_form.validate():
+                message, status = add_subcategory(add_subcategory_form.category_name.data,
+                                                  add_subcategory_form.subcategory_name.data)
+                flash(message, status)
+                return redirect(url_for("category_page"))
+        if remove_subcategory_form.submit.data:
+            if remove_subcategory_form.validate():
+                message, status = remove_subcategory(remove_subcategory_form.category_name.data,
+                                                     remove_subcategory_form.subcategory_name.data)
+                flash(message, status)
+                return redirect(url_for("category_page"))
     return render_template("category.html", data=categories, add_category_form=add_category_form,
                     add_subcategory_form=add_subcategory_form, remove_categgory_form=remove_category_form,
                     remove_subcategory_form=remove_subcategory_form)

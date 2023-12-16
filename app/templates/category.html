@@ -196,42 +196,53 @@
     $('#modal-remsubcat').modal('show');
     </script>
 {% endif %}
-    <script>
-    // Dont know how this shiet works
-    $(document).ready(function() {
-        $('#category-select').change(function() {
-            // Get the selected value
-            var selectedValue = $(this).val();
-            console.log('Selected Value:', selectedValue);
-            // Make an AJAX request to fetch the new options for the second field
-            $.ajax({
-                url: '/get_subcategory_field_options',  // Update the URL to match your Flask route
-                method: 'POST',
-                data: { selected_value: selectedValue },
-                dataType: 'json',
-                success: function(data) {
-                    // Get the SelectField you want to update
-                    var subCategoryList = $('#subcategory-list');
-                    var subCategoryField = $('#rem-subcat-field');
-                    // Clear existing options
-                    subCategoryList.empty();
-                    subCategoryField.empty();
+<script>
+  // Function to fetch and update subcategory options
+  function updateSubcategoryOptions(selectedValue) {
+    // Make an AJAX request to fetch the new options for the second field
+    $.ajax({
+      url: '/get_subcategory_field_options',  // Update the URL to match your Flask route
+      method: 'POST',
+      data: { selected_value: selectedValue },
+      dataType: 'json',
+      success: function(data) {
+        // Get the SelectField you want to update
+        var subCategoryList = $('#subcategory-list');
+        var subCategoryField = $('#rem-subcat-field');
+        // Clear existing options
+        subCategoryList.empty();
+        subCategoryField.empty();
 
-                    // Add new options based on the data from the server
-                    for (var i = 0; i < data.length; i++) {
-                        subCategoryList.append($('<li>', {
-                            class: "list-group-item"
-                        }).text(data[i]));
-                        subCategoryField.append($('<option>', {
-                            value: data[i],
-                            text: data[i]
-                        }));
-                    }
-                }
-            });
-        });
+        // Add new options based on the data from the server
+        for (var i = 0; i < data.length; i++) {
+          subCategoryList.append($('<li>', {
+            class: "list-group-item"
+          }).text(data[i]));
+          subCategoryField.append($('<option>', {
+            value: data[i],
+            text: data[i]
+          }));
+        }
+      }
     });
+  }
+
+  // Execute the function on initial load
+  $(document).ready(function() {
+    // Call the function with the default selected value
+    updateSubcategoryOptions($('#category-select').val());
+  });
+
+  // Attach the change event handler
+  $('#category-select').change(function() {
+    // Get the selected value
+    var selectedValue = $(this).val();
+    console.log('Selected Value:', selectedValue);
+    // Call the function to update options based on the selected value
+    updateSubcategoryOptions(selectedValue);
+  });
 </script>
+
 <script>
     function updateHiddenField() {
         var selectedOption = document.getElementById('category-select').value;
