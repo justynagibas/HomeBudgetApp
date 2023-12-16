@@ -12,3 +12,8 @@
 .transaction-table.table-bordered > tbody > tr > th{
     border:1px solid #e0e0e0;
 }
+
+.list-group-item{
+    background-color: #343a40;
+    color:white;
+    border-color: #e0e0e0}
