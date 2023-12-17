@@ -15,7 +15,7 @@ class TransOutcomeForm(FlaskForm):
         choices=[],
         validators=[Length(max=100), Optional()],
     )
-    submit = SubmitField("Submit")
+    submit = SubmitField("Add new outcome")
 
 
 class TransIncomeForm(FlaskForm):
@@ -25,4 +25,4 @@ class TransIncomeForm(FlaskForm):
     )
     date = DateField("Date:", validators=[DataRequired()])
     subcategory = SelectField("Subcategory:", choices=[], validators=[Optional(), Length(max=100)])
-    submit = SubmitField("Submit")
+    submit = SubmitField("Add new income")

@@ -8,11 +8,11 @@ class BudgetOutcomeForm(FlaskForm):
         "Value:", validators=[DataRequired(), NumberRange(min=0, message="Transaction has to be positive!")]
     )
     main_category = SelectField("Main category:", choices=[], validators=[InputRequired(), Length(max=100)])
-    submit = SubmitField("Submit")
+    submit = SubmitField("Add budget outcome")
 
 
 class BudgetIncomeForm(FlaskForm):
     value = FloatField(
         "Value:", validators=[DataRequired(), NumberRange(min=0, message="Transaction has to be positive!")]
     )
-    submit = SubmitField("Submit")
+    submit = SubmitField("Add budget income")

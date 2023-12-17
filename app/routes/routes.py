@@ -21,11 +21,9 @@ from app.category.manage_category import (
 from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
-    get_user_income_plan,
-    get_user_outcome_plan,
-    get_user_income_actual,
-    get_user_outcome_actual,
-    get_categories_data,
+    get_user_monthly_budget_sums,
+    get_user_monthly_transaction_sums,
+    get_user_monthly_category_outcomes,
 )
 import pandas as pd
 from datetime import datetime, date
@@ -34,7 +32,9 @@ import calendar
 from app.routes.forms import AddGoalForm, AddGoalProgress
 
 
-this_date = datetime.now().strftime("%d %B, %Y")
+this_date = datetime.now().strftime("%B, %Y")
+this_month = date.today().month
+this_year = date.today().year
 
 
 @app.route("/")
@@ -50,17 +50,18 @@ def hello():
 def home():
     percent_of_month = round((date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100)
 
-    user_income_plan = get_user_income_plan(current_user.get_id())
-    user_outcome_plan = get_user_outcome_plan(current_user.get_id())
+    user_income_plan, user_outcome_plan = get_user_monthly_budget_sums(current_user.get_id(), this_month, this_year)
     user_planned_balance = user_income_plan - user_outcome_plan
 
-    user_income_actual = get_user_income_actual(current_user.get_id())
-    user_outcome_actual = get_user_outcome_actual(current_user.get_id())
+    user_income_actual, user_outcome_actual = get_user_monthly_transaction_sums(
+        current_user.get_id(), this_month, this_year
+    )
+
     user_actual_balance = user_income_actual - user_outcome_actual
 
     already_spent_percentage = round(user_outcome_actual / user_income_actual * 100) if user_income_actual != 0 else 0
 
-    user_categories_data = get_categories_data(current_user.get_id())
+    user_categories_data = get_user_monthly_category_outcomes(current_user.get_id(), this_month, this_year)
 
     return render_template(
         "home.html",
@@ -207,7 +208,7 @@ def get_second_field_options():
     return jsonify(subcategory_choices)
 
 
-@app.route('/delete-record', methods=["POST"])
+@app.route("/delete-record", methods=["POST"])
 def delete_record():
     id, record_type = json.loads(request.data).values()
     if record_type == "transaction":
@@ -221,6 +222,7 @@ def delete_record():
         db.session.commit()
         flash("Budget plan entry deleted successfully!", "success")
     return jsonify({})
+
 
 @app.route("/addgoal", methods=["GET", "POST"])
 def goals():

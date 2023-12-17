@@ -43,10 +43,12 @@
                             <td>{{ entry['amount'] }}</td>
                             <td>{{ entry['month'] }}</td>
                             <td>{{ entry['year'] }}</td>
-                            <td class="text-center">
-                                <button type="button" class="close"  onClick="deleteRecord({{ entry["id"] }}, 'budget')">
-                                    <span class="text text-light" aria-hidden="true">&times;</span>
-                                </button>
+                            <td style="background-color:red">
+                                <div style="display: flex; justify-content:center; align-items:center">
+                                    <button type="button" class="close" onClick="deleteRecord({{ entry["id"] }}, 'budget')">
+                                        <span class="text text-light" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -68,6 +70,19 @@
                     <form method="POST" action="" novalidate>
                         {{ form_outcome.hidden_tag() }}
                         <div class="form-group">
+                            <label for="name">Category:</label>
+                            {% if form_outcome.main_category.errors %}
+                                {{ form_outcome.main_category(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.main_category.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.main_category(class="form-control", id="main-category") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
                             <label for="name">Value:</label>
                             {% if form_outcome.value.errors %}
                                 {{ form_outcome.value(class="form-control is-invalid") }}
@@ -78,19 +93,6 @@
                                 </div>
                             {% else %}
                                 {{ form_outcome.value(class="form-control", type="number") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Main category:</label>
-                            {% if form_outcome.main_category.errors %}
-                                {{ form_outcome.main_category(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form_outcome.main_category.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form_outcome.main_category(class="form-control", id="main-category") }}
                             {% endif %}
                         </div>
                         {{ form_outcome.submit(class="btn btn-outline-light btn-block", id="submit-outcome")}}
