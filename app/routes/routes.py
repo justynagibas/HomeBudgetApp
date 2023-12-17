@@ -4,9 +4,18 @@ import sqlalchemy
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
-from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
+from app.transaction_tracking.transaction_forms import TransOutcomeForm, TransIncomeForm
 from app.transaction_tracking.transaction_tracking import get_transaction_categories, add_transaction, get_transactions
-from app.category.manage_category import add_category, add_subcategory, remove_category,remove_subcategory, get_subcategories, get_categories
+from app.budget_tracking.budget_forms import BudgetIncomeForm, BudgetOutcomeForm
+from app.budget_tracking.budget_tracking import get_budget_categories_names, add_budget_entry, get_budget_entries
+from app.category.manage_category import (
+    add_category,
+    add_subcategory,
+    remove_category,
+    remove_subcategory,
+    get_subcategories,
+    get_categories,
+)
 from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
@@ -115,48 +124,86 @@ def about():
 def tutorial():
     return render_template("tutorial.html")
 
+
 @app.route("/transaction_tracking", methods=["GET", "POST"])
 def transaction_tracking():
     if current_user.is_authenticated:
         results = get_transactions(current_user.id)
         # Convert to Pandas DataFrame
         df = pd.DataFrame(results)
-        form_outcome = OutcomeForm(prefix='outcome')
-        out_cat_dict = get_transaction_categories(current_user.id, 'outcome')
+        form_outcome = TransOutcomeForm(prefix="outcome")
+        out_cat_dict = get_transaction_categories(current_user.id, "outcome")
         form_outcome.main_category.choices += [cat for cat in out_cat_dict.keys()]
         selected_cat = form_outcome.main_category.data if form_outcome.main_category.data else "Food"
-        form_outcome.subcategory.choices += [subcat for subcat in out_cat_dict.get(selected_cat,[])]
-        form_income = IncomeForm(prefix='income')
-        subcat_in = get_transaction_categories(current_user.id, 'income')
+        form_outcome.subcategory.choices += [subcat for subcat in out_cat_dict.get(selected_cat, [])]
+        form_income = TransIncomeForm(prefix="income")
+        subcat_in = get_transaction_categories(current_user.id, "income")
         form_income.subcategory.choices += [cat[0] for cat in subcat_in]
-        if request.method == 'POST':
+        if request.method == "POST":
             if form_outcome.submit.data:
                 if form_outcome.validate():
-                    add_transaction(form_outcome,current_user.id, "outcome")
-                    flash("Outcome added successfully!", 'success')
+                    add_transaction(form_outcome, current_user.id, "outcome")
+                    flash("Outcome added successfully!", "success")
                     return redirect(url_for("transaction_tracking"))
             elif form_income.submit.data:
                 if form_income.validate():
                     add_transaction(form_income, current_user.id, "income")
-                    flash("Income added successfully!", 'success')
+                    flash("Income added successfully!", "success")
                     return redirect(url_for("transaction_tracking"))
-        return render_template("transaction_tracking.html", form_outcome=form_outcome, form_income=form_income, transactions=df)
+        return render_template(
+            "transaction_tracking.html", form_outcome=form_outcome, form_income=form_income, transactions=df
+        )
 
     else:
         flash("First create account or log in if you have one!")
         return redirect(url_for("login"))
 
-@app.route('/get_second_field_options', methods=['POST'])
+
+@app.route("/budget_tracking", methods=["GET", "POST"])
+def budget_tracking():
+    if current_user.is_authenticated:
+        outcome_cat_names = get_budget_categories_names(current_user.id)
+        form_outcome = BudgetOutcomeForm(prefix="outcome")
+        form_outcome.main_category.choices += outcome_cat_names
+
+        form_income = BudgetIncomeForm(prefix="income")
+
+        budget_entries = pd.DataFrame(get_budget_entries(current_user.id))
+        print(budget_entries)
+
+        if request.method == "POST":
+            if form_outcome.submit.data:
+                if form_outcome.validate():
+                    add_budget_entry(form_outcome, current_user.id, "outcome", date.today().year, date.today().month)
+                    flash("Budget outcome added successfully!", "success")
+                    return redirect(url_for("budget_tracking"))
+            elif form_income.submit.data:
+                if form_income.validate():
+                    add_budget_entry(form_income, current_user.id, "income", date.today().year, date.today().month)
+                    flash("Budget income added successfully!", "success")
+                    return redirect(url_for("budget_tracking"))
+
+        return render_template(
+            "budget_tracking.html", form_outcome=form_outcome, form_income=form_income, budget_entries=budget_entries
+        )
+
+    else:
+        flash("First create account or log in if you have one!")
+        return redirect(url_for("login"))
+
+
+@app.route("/get_second_field_options", methods=["POST"])
 def get_second_field_options():
-    selected_cat = request.form.get('selected_value')
+    selected_cat = request.form.get("selected_value")
 
     # Use the selected value to determine the new options for the second field
     # Replace this logic with your own based on your requirements
-    out_cat_dict = get_transaction_categories(current_user.id, 'outcome')
+    out_cat_dict = get_transaction_categories(current_user.id, "outcome")
     subcategory_choices = [subcat for subcat in out_cat_dict.get(selected_cat, [])]
 
     # Return the new options as JSON
     return jsonify(subcategory_choices)
+
 
 @app.route("/addgoal", methods=["GET", "POST"])
 def goals():
@@ -228,12 +275,12 @@ def show_goals():
 @app.route("/categories", methods=["GET", "POST"])
 def category_page():
     categories = get_categories()
-    add_category_form = AddCategoryForm(prefix='addcat')
-    remove_category_form = RemoveCategoryForm(prefix='remcat')
-    add_subcategory_form = AddSubcategoryForm(prefix='addsubcat')
-    remove_subcategory_form = RemoveSubcategoryForm(prefix='remsubcat')
-    remove_category_form.category_name.choices=categories
-    if request.method == 'POST':
+    add_category_form = AddCategoryForm(prefix="addcat")
+    remove_category_form = RemoveCategoryForm(prefix="remcat")
+    add_subcategory_form = AddSubcategoryForm(prefix="addsubcat")
+    remove_subcategory_form = RemoveSubcategoryForm(prefix="remsubcat")
+    remove_category_form.category_name.choices = categories
+    if request.method == "POST":
         if add_category_form.submit.data:
             if add_category_form.validate():
                 message, status = add_category(add_category_form.category_name.data)
@@ -246,26 +293,31 @@ def category_page():
                 return redirect(url_for("category_page"))
         if add_subcategory_form.submit.data:
             if add_subcategory_form.validate():
-                message, status = add_subcategory(add_subcategory_form.category_name.data,
-                                                  add_subcategory_form.subcategory_name.data)
+                message, status = add_subcategory(
+                    add_subcategory_form.category_name.data, add_subcategory_form.subcategory_name.data
+                )
                 flash(message, status)
                 return redirect(url_for("category_page"))
         if remove_subcategory_form.submit.data:
             if remove_subcategory_form.validate():
-                message, status = remove_subcategory(remove_subcategory_form.category_name.data,
-                                                     remove_subcategory_form.subcategory_name.data)
+                message, status = remove_subcategory(
+                    remove_subcategory_form.category_name.data, remove_subcategory_form.subcategory_name.data
+                )
                 flash(message, status)
                 return redirect(url_for("category_page"))
-    return render_template("category.html", data=categories, add_category_form=add_category_form,
-                    add_subcategory_form=add_subcategory_form, remove_categgory_form=remove_category_form,
-                    remove_subcategory_form=remove_subcategory_form)
+    return render_template(
+        "category.html",
+        data=categories,
+        add_category_form=add_category_form,
+        add_subcategory_form=add_subcategory_form,
+        remove_categgory_form=remove_category_form,
+        remove_subcategory_form=remove_subcategory_form,
+    )
 
 
-
-
-@app.route('/get_subcategory_field_options', methods=['POST'])
+@app.route("/get_subcategory_field_options", methods=["POST"])
 def get_subcategory_field_options():
-    selected_cat = request.form.get('selected_value')
+    selected_cat = request.form.get("selected_value")
 
     # Use the selected value to determine the new options for the second field
     # Replace this logic with your own based on your requirements

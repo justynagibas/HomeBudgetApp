@@ -39,7 +39,7 @@
                 {%  if not transactions.empty %}
                     {% for index, transaction in transactions.iterrows() %}
                         <tr>
-                            <td>{{ index }}</td>
+                            <td>{{ index + 1 }}</td>
                             <td>{{ transaction['name'] }}</td>
                             <td>{{ transaction['subcategory_name'] }}</td>
                             <td>{{ transaction['transaction_date'] }}</td>

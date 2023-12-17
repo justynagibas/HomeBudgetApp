@@ -244,10 +244,20 @@
 </script>
 
 <script>
+    // Function to update hidden fields
     function updateHiddenField() {
         var selectedOption = document.getElementById('category-select').value;
         $('#add-subcat-form').val(selectedOption);
         $('#rem-subcat-form').val(selectedOption);
     }
+
+    // Function to be called on page load
+    function onReadyFunction() {
+        // Call the updateHiddenField function on page load
+        updateHiddenField();
+    }
+
+    // Add event listener for DOMContentLoaded to call onReadyFunction
+    document.addEventListener('DOMContentLoaded', onReadyFunction);
 </script>
 {% endblock %}
