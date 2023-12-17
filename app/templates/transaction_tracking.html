@@ -24,7 +24,7 @@
         <table class="table table-dark table-striped mb-0 transaction-table table-bordered">
             <thead>
                 <tr>
-                   <th colspan="6" class="text-center"><h3>Transactions </h3></th>
+                   <th colspan="7" class="text-center"><h3>Transactions </h3></th>
                 </tr>
                 <tr>
                    <th scope="col" class="text-center">Lp.</th>
@@ -45,6 +45,11 @@
                             <td>{{ transaction['transaction_date'] }}</td>
                             <td>{{ transaction['value'] }}</td>
                             <td>{{ transaction['user_note'] }}</td>
+                            <td class="text-center">
+                                <button type="button" class="close" onClick="deleteRecord({{ transaction["id"] }}, 'transaction')">
+                                    <span class="text text-light" aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endif %}

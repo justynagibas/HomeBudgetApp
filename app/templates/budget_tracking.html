@@ -43,6 +43,11 @@
                             <td>{{ entry['amount'] }}</td>
                             <td>{{ entry['month'] }}</td>
                             <td>{{ entry['year'] }}</td>
+                            <td class="text-center">
+                                <button type="button" class="close"  onClick="deleteRecord({{ entry["id"] }}, 'budget')">
+                                    <span class="text text-light" aria-hidden="true">&times;</span>
+                                </button>
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endif %}

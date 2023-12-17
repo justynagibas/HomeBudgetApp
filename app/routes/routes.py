@@ -1,3 +1,5 @@
+import json
+
 from app import app, request, db
 from flask import render_template, redirect, url_for, flash, request, jsonify
 import sqlalchemy
@@ -204,6 +206,21 @@ def get_second_field_options():
     # Return the new options as JSON
     return jsonify(subcategory_choices)
 
+
+@app.route('/delete-record', methods=["POST"])
+def delete_record():
+    id, record_type = json.loads(request.data).values()
+    if record_type == "transaction":
+        delete_transaction = db.session.get(Transactions, id)
+        db.session.delete(delete_transaction)
+        db.session.commit()
+        flash("Transaction deleted successfully!", "success")
+    elif record_type == "budget":
+        delete_budget_entry = db.session.get(Budget, id)
+        db.session.delete(delete_budget_entry)
+        db.session.commit()
+        flash("Budget plan entry deleted successfully!", "success")
+    return jsonify({})
 
 @app.route("/addgoal", methods=["GET", "POST"])
 def goals():
