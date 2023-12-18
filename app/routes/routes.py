@@ -224,13 +224,11 @@ def delete_record():
         flash("Budget plan entry deleted successfully!", "success")
     elif record_type.lower() == "goal":
         goal_entry = db.session.get(Goals, id_)
-        print(goal_entry.name)
         goal_transactions = (
             Transactions.query.filter_by(user_id=current_user.get_id(), goal_id=id_)
             .with_entities(Transactions.value)
             .all()
         )
-        print(goal_transactions)
         goal_sum = float(sum([transaction[0] for transaction in goal_transactions]) if goal_transactions else 0)
 
         record = Transactions(
@@ -298,7 +296,6 @@ def add_goal_progress():
 
     goals_transactions = get_goals_transactions(current_user.get_id())
     goals_transactions = pd.DataFrame(goals_transactions)
-    print(goals_transactions)
     if form.validate_on_submit():
         goal_transaction = Transactions(
             transaction_date=form.date.data,
