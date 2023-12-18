@@ -63,11 +63,18 @@
                 {%  if not transactions.empty %}
                     {% for index, transaction in transactions.iterrows() %}
                         <tr>
-                            <td>{{ index }}</td>
-                            <td>{{ transaction['name'] }}</td>
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ transaction['name'] + " (Goal ID :" + transaction['goal_id']|string + ")" }}</td>
                             <td>{{ transaction['transaction_date'] }}</td>
                             <td>{{ transaction['value'] }}</td>
                             <td>{{ transaction['user_note'] }}</td>
+                            <td class="text-center" style="background-color:red">
+                                <div style="display: flex; justify-content:center; align-items:center">
+                                    <button type="button" class="close" onClick="deleteRecord({{transaction["id"]}}, 'transaction')">
+                                        <span class="text text-light" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endif %}

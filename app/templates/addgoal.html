@@ -9,16 +9,24 @@
             <div class="col-md-8" id="goals_percentages">
                 {% for item in goals_data %}
                 <div>
-                    {{ item[0]|safe }} <br> Deadline: {{item[2]|safe}}
+                <div style="display: inline-block;" >
+                    {{ item[1]|safe }} <br> Deadline: {{item[3]|safe}}
+                </div>
+                <div style="display: inline-block; margin-right: 0">
+                        <button type="button" class="close" onClick="deleteRecord({{item[0]|safe }}, 'goal')">
+                            <span class="text text-light" aria-hidden="true">&times;</span>
+                        </button>
+                </div>
                     <div>
-                        <canvas id="{{ item[0]|safe }}_bar" style="height: 25px"></canvas>
+                        <canvas id="{{ item[1]|safe }}_bar" style="height: 25px"></canvas>
                     </div>
                     <div class="row" style="text-align:center">
                         <div class="col-md-12">
-                            {{ item[3]|safe }} out of {{ item[1]|safe }}
+                            {{ item[4]|safe }} out of {{ item[2]|safe }}
                         </div>
                     </div>
                 </div>
+
                 {% endfor %}
             </div>
             <div class="col-md-4" style = "display: grid; place-items: center">
@@ -26,7 +34,7 @@
                     <canvas id="pie_1"></canvas>
                 {% else %}
                     <div style = "display: grid; place-items: center;">
-                        <h6>Please add new transactions to see the analysis!</h6>
+                        <h6>Please add new goal to see the analysis!</h6>
                     </div>
                 {% endif %}
             </div>
@@ -79,12 +87,12 @@
         var pie_data = new Array();
 
         for(var i =0 ;i < goals.length;i++){
-            cat_name = goals[i][0];
+            cat_name = goals[i][1];
             id_name = cat_name + "_bar";
             var percentage = 0;
-            if(goals[i][4] != 0)
+            if(goals[i][5] != 0)
             {
-                percentage = goals[i][4];
+                percentage = goals[i][5];
                 if(percentage > 100)
                 {
                     percentage = 100;
@@ -92,7 +100,7 @@
             }
             progress_bar(id_name,percentage,'rgb(176, 196, 222)');
             pie_labels.push(cat_name);
-            pie_data.push(goals[i][2]);
+            pie_data.push(goals[i][3]);
         }
    });
 </script>
