@@ -33,6 +33,7 @@ def add_transaction(form, userID, transaction_type):
 
 def get_transactions(userId):
     return db.session.query(
+        Transactions.id,
         Transactions.transaction_date,
         Transactions.value,
         Category.name,
