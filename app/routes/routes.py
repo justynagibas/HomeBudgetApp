@@ -180,9 +180,13 @@ def goals():
     user_goals_data = get_goals_data(current_user.get_id())
 
     if form.validate_on_submit():
-        insert_goal(form.name.data, form.target_amount.data, form.deadline.data, current_user.id)
-        flash(f"New Goal has been added", "success")
-        return render_template("addgoal.html", form=form)
+        user_goals = Goals.query.filter_by(user_id=current_user.get_id()).with_entities(Goals.name).all()
+        if (str(form.name.data),) in user_goals:
+            flash("Invalid goal name", "danger")
+        else:
+            insert_goal(form.name.data, form.target_amount.data, form.deadline.data, current_user.id)
+            flash(f"New Goal has been added", "success")
+        return redirect("addgoal")
     return render_template("addgoal.html", form=form, goals_data=user_goals_data)
 
 
@@ -215,7 +219,7 @@ def add_goal_progress():
         db.session.add(goal_transaction)
         db.session.commit()
         flash(f"Goal Progress has been added", "success")
-        return render_template("addgoalprogress.html", form=form, transactions=goals_transactions)
+        return redirect("addgoalprogress")
     return render_template("addgoalprogress.html", form=form, transactions=goals_transactions)
 
 

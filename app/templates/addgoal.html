@@ -11,7 +11,7 @@
                 <div>
                     {{ item[0]|safe }} <br> Deadline: {{item[2]|safe}}
                     <div>
-                        <canvas id="{{ item[1]|safe }}_bar" style="height: 25px"></canvas>
+                        <canvas id="{{ item[0]|safe }}_bar" style="height: 25px"></canvas>
                     </div>
                     <div class="row" style="text-align:center">
                         <div class="col-md-12">
@@ -79,7 +79,7 @@
         var pie_data = new Array();
 
         for(var i =0 ;i < goals.length;i++){
-            cat_name = goals[i][1];
+            cat_name = goals[i][0];
             id_name = cat_name + "_bar";
             var percentage = 0;
             if(goals[i][4] != 0)
