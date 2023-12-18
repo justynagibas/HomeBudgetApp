@@ -18,6 +18,8 @@ from app.category.manage_category import (
     get_subcategories,
     get_categories,
 )
+from app.category.manage_category import add_category, add_subcategory, remove_category,remove_subcategory, get_subcategories, get_categories
+from app.analysis.plot_queries import get_category_progress, get_category_plan, get_subcategories_spendings
 from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
@@ -344,3 +346,15 @@ def get_subcategory_field_options():
 
     # Return the new options as JSON
     return jsonify(subcategory_choices)
+
+
+
+@app.route("/analysis", methods=["GET", "POST"])
+def analysis_page():
+    categories = get_categories()
+    category = 'Food'
+    category_plan = get_category_plan(category)
+    subcategories_spending = get_subcategories_spendings(category)
+    category_spending_percent = round(get_category_progress(category) / category_plan * 100) if category_plan != 0 else 0
+    return render_template("analysis.html", data=categories, category_spending=category_spending_percent,
+                           subcategories_spending=subcategories_spending)
