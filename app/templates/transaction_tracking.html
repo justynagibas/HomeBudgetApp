@@ -24,7 +24,7 @@
         <table class="table table-dark table-striped mb-0 transaction-table table-bordered">
             <thead>
                 <tr>
-                   <th colspan="6" class="text-center"><h3>Transactions </h3></th>
+                   <th colspan="7" class="text-center"><h3>Transactions </h3></th>
                 </tr>
                 <tr>
                    <th scope="col" class="text-center">Lp.</th>
@@ -39,12 +39,19 @@
                 {%  if not transactions.empty %}
                     {% for index, transaction in transactions.iterrows() %}
                         <tr>
-                            <td>{{ index }}</td>
+                            <td>{{ index + 1 }}</td>
                             <td>{{ transaction['name'] }}</td>
                             <td>{{ transaction['subcategory_name'] }}</td>
                             <td>{{ transaction['transaction_date'] }}</td>
                             <td>{{ transaction['value'] }}</td>
                             <td>{{ transaction['user_note'] }}</td>
+                            <td class="text-center" style="background-color:red">
+                                <div style="display: flex; justify-content:center; align-items:center">
+                                    <button type="button" class="close" onClick="deleteRecord({{ transaction["id"] }}, 'transaction')">
+                                        <span class="text text-light" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endif %}
@@ -64,45 +71,6 @@
                 <div class="modal-body">
                     <form method="POST" action="" novalidate>
                         {{ form_outcome.hidden_tag() }}
-                        <div class="form-group">
-                            <label for="name">Note:</label>
-                            {% if form_outcome.note.errors %}
-                                {{ form_outcome.note(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form_outcome.note.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form_outcome.note(class="form-control", type="text") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Value:</label>
-                            {% if form_outcome.value.errors %}
-                                {{ form_outcome.value(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form_outcome.value.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form_outcome.value(class="form-control", type="number") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Date:</label>
-                            {% if form_outcome.date.errors %}
-                                {{ form_outcome.date(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form_outcome.date.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form_outcome.date(class="form-control", type="date") }}
-                            {% endif %}
-                        </div>
                         <div class="form-group">
                             <label for="name">Main category:</label>
                             {% if form_outcome.main_category.errors %}
@@ -129,6 +97,45 @@
                                 {{ form_outcome.subcategory(class="form-control", id="sub-category") }}
                             {% endif %}
                         </div>
+                        <div class="form-group">
+                            <label for="name">Date:</label>
+                            {% if form_outcome.date.errors %}
+                                {{ form_outcome.date(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.date.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.date(class="form-control", type="date") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Value:</label>
+                            {% if form_outcome.value.errors %}
+                                {{ form_outcome.value(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.value.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.value(class="form-control", type="number") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Note:</label>
+                            {% if form_outcome.note.errors %}
+                                {{ form_outcome.note(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_outcome.note.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_outcome.note(class="form-control", type="text") }}
+                            {% endif %}
+                        </div>
                         {{ form_outcome.submit(class="btn btn-outline-light btn-block", id="submit-outcome")}}
                     </form>
                 </div>
@@ -149,29 +156,16 @@
                     <form method="POST" action="" novalidate>
                         {{ form_income.hidden_tag() }}
                         <div class="form-group">
-                            <label for="name">Note:</label>
-                            {% if form_income.note.errors %}
-                                {{ form_income.note(class="form-control is-invalid") }}
+                            <label for="name">Subcategory:</label>
+                            {% if form_income.subcategory.errors %}
+                                {{ form_income.subcategory(class="form-control is-invalid") }}
                                 <div class="invalid-feedback">
-                                    {% for error in form_income.note.errors %}
+                                    {% for error in form_income.subcategory.errors %}
                                         <span>{{ error }}</span>
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form_income.note(class="form-control", type="text") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Value:</label>
-                            {% if form_income.value.errors %}
-                                {{ form_income.value(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form_income.value.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form_income.value(class="form-control", type="number") }}
+                                {{ form_income.subcategory(class="form-control", id="income-subcategory") }}
                             {% endif %}
                         </div>
                         <div class="form-group">
@@ -188,16 +182,29 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <label for="name">Subcategory:</label>
-                            {% if form_income.subcategory.errors %}
-                                {{ form_income.subcategory(class="form-control is-invalid") }}
+                            <label for="name">Value:</label>
+                            {% if form_income.value.errors %}
+                                {{ form_income.value(class="form-control is-invalid") }}
                                 <div class="invalid-feedback">
-                                    {% for error in form_income.subcategory.errors %}
+                                    {% for error in form_income.value.errors %}
                                         <span>{{ error }}</span>
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form_income.subcategory(class="form-control", id="income-subcategory") }}
+                                {{ form_income.value(class="form-control", type="number") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Note:</label>
+                            {% if form_income.note.errors %}
+                                {{ form_income.note(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form_income.note.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form_income.note(class="form-control", type="text") }}
                             {% endif %}
                         </div>
                         {{ form_income.submit(class="btn btn-outline-light btn-block", id="submit-income" )}}

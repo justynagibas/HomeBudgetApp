@@ -1,6 +1,6 @@
 {% extends "main_layout.html" %} {% block content %}
-    <div class="container text-center">
-        <h1>Your Categories</h1>
+    <div class="container text-center mt-3">
+        <h1><strong>Your Categories</strong></h1>
     </div>
     <div class="row mt-3">
         <div class="col-md-5 offset-md-1">
@@ -244,10 +244,20 @@
 </script>
 
 <script>
+    // Function to update hidden fields
     function updateHiddenField() {
         var selectedOption = document.getElementById('category-select').value;
         $('#add-subcat-form').val(selectedOption);
         $('#rem-subcat-form').val(selectedOption);
     }
+
+    // Function to be called on page load
+    function onReadyFunction() {
+        // Call the updateHiddenField function on page load
+        updateHiddenField();
+    }
+
+    // Add event listener for DOMContentLoaded to call onReadyFunction
+    document.addEventListener('DOMContentLoaded', onReadyFunction);
 </script>
 {% endblock %}

@@ -1,11 +1,15 @@
+import json
+
 from app import app, request, db
 from flask import render_template, redirect, url_for, flash, request, jsonify
 import sqlalchemy
 from app.auth.auth import insert_user, check_user_credentials, load_user
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
-from app.transaction_tracking.transaction_forms import OutcomeForm, IncomeForm
+from app.transaction_tracking.transaction_forms import TransOutcomeForm, TransIncomeForm
 from app.transaction_tracking.transaction_tracking import get_transaction_categories, add_transaction, get_transactions
+from app.budget_tracking.budget_forms import BudgetIncomeForm, BudgetOutcomeForm
+from app.budget_tracking.budget_tracking import get_budget_categories_names, add_budget_entry, get_budget_entries
 from app.category.manage_category import (
     add_category,
     add_subcategory,
@@ -17,11 +21,9 @@ from app.category.manage_category import (
 from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
-    get_user_income_plan,
-    get_user_outcome_plan,
-    get_user_income_actual,
-    get_user_outcome_actual,
-    get_categories_data,
+    get_user_monthly_budget_sums,
+    get_user_monthly_transaction_sums,
+    get_user_monthly_category_outcomes,
     get_goals_data,
 )
 import pandas as pd
@@ -31,7 +33,9 @@ import calendar
 from app.routes.forms import AddGoalForm, AddGoalProgress
 
 
-this_date = datetime.now().strftime("%d %B, %Y")
+this_date = datetime.now().strftime("%B, %Y")
+this_month = date.today().month
+this_year = date.today().year
 
 
 @app.route("/")
@@ -47,17 +51,18 @@ def hello():
 def home():
     percent_of_month = round((date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100)
 
-    user_income_plan = get_user_income_plan(current_user.get_id())
-    user_outcome_plan = get_user_outcome_plan(current_user.get_id())
+    user_income_plan, user_outcome_plan = get_user_monthly_budget_sums(current_user.get_id(), this_month, this_year)
     user_planned_balance = user_income_plan - user_outcome_plan
 
-    user_income_actual = get_user_income_actual(current_user.get_id())
-    user_outcome_actual = get_user_outcome_actual(current_user.get_id())
+    user_income_actual, user_outcome_actual = get_user_monthly_transaction_sums(
+        current_user.get_id(), this_month, this_year
+    )
+
     user_actual_balance = user_income_actual - user_outcome_actual
 
     already_spent_percentage = round(user_outcome_actual / user_income_actual * 100) if user_income_actual != 0 else 0
 
-    user_categories_data = get_categories_data(current_user.get_id())
+    user_categories_data = get_user_monthly_category_outcomes(current_user.get_id(), this_month, this_year)
 
     return render_template(
         "home.html",
@@ -130,12 +135,12 @@ def transaction_tracking():
         results = get_transactions(current_user.id)
         # Convert to Pandas DataFrame
         df = pd.DataFrame(results)
-        form_outcome = OutcomeForm(prefix="outcome")
+        form_outcome = TransOutcomeForm(prefix="outcome")
         out_cat_dict = get_transaction_categories(current_user.id, "outcome")
         form_outcome.main_category.choices += [cat for cat in out_cat_dict.keys()]
         selected_cat = form_outcome.main_category.data if form_outcome.main_category.data else "Food"
         form_outcome.subcategory.choices += [subcat for subcat in out_cat_dict.get(selected_cat, [])]
-        form_income = IncomeForm(prefix="income")
+        form_income = TransIncomeForm(prefix="income")
         subcat_in = get_transaction_categories(current_user.id, "income")
         form_income.subcategory.choices += [cat[0] for cat in subcat_in]
         if request.method == "POST":
@@ -158,6 +163,39 @@ def transaction_tracking():
         return redirect(url_for("login"))
 
 
+@app.route("/budget_tracking", methods=["GET", "POST"])
+def budget_tracking():
+    if current_user.is_authenticated:
+        outcome_cat_names = get_budget_categories_names(current_user.id)
+        form_outcome = BudgetOutcomeForm(prefix="outcome")
+        form_outcome.main_category.choices += outcome_cat_names
+
+        form_income = BudgetIncomeForm(prefix="income")
+
+        budget_entries = pd.DataFrame(get_budget_entries(current_user.id))
+        print(budget_entries)
+
+        if request.method == "POST":
+            if form_outcome.submit.data:
+                if form_outcome.validate():
+                    add_budget_entry(form_outcome, current_user.id, "outcome", date.today().year, date.today().month)
+                    flash("Budget outcome added successfully!", "success")
+                    return redirect(url_for("budget_tracking"))
+            elif form_income.submit.data:
+                if form_income.validate():
+                    add_budget_entry(form_income, current_user.id, "income", date.today().year, date.today().month)
+                    flash("Budget income added successfully!", "success")
+                    return redirect(url_for("budget_tracking"))
+
+        return render_template(
+            "budget_tracking.html", form_outcome=form_outcome, form_income=form_income, budget_entries=budget_entries
+        )
+
+    else:
+        flash("First create account or log in if you have one!")
+        return redirect(url_for("login"))
+
+
 @app.route("/get_second_field_options", methods=["POST"])
 def get_second_field_options():
     selected_cat = request.form.get("selected_value")
@@ -169,6 +207,23 @@ def get_second_field_options():
 
     # Return the new options as JSON
     return jsonify(subcategory_choices)
+
+
+@app.route("/delete-record", methods=["POST"])
+def delete_record():
+    id, record_type = json.loads(request.data).values()
+    if record_type == "transaction":
+        delete_transaction = db.session.get(Transactions, id)
+        db.session.delete(delete_transaction)
+        db.session.commit()
+        flash("Transaction deleted successfully!", "success")
+    elif record_type == "budget":
+        delete_budget_entry = db.session.get(Budget, id)
+        db.session.delete(delete_budget_entry)
+        db.session.commit()
+        flash("Budget plan entry deleted successfully!", "success")
+    return jsonify({})
+
 
 
 @app.route("/addgoal", methods=["GET", "POST"])
