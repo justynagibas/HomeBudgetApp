@@ -38,9 +38,9 @@ def get_subcategories_spendings(category_name, this_month, this_year):
         subcategories_spending[i][1] = float(subcategories_spending[i][1])
     return  subcategories_spending
 
-def get_category_historic_data(category_name, this_month, this_year):
+def get_category_historic_data(category_name,  this_year):
     historic_data = []
-    for month in range(1,this_month+1):
+    for month in range(1,13):
         month_budget = db.session.query(Budget.amount).join(Category).filter(
             Budget.user_id == current_user.get_id(),
             Category.name == category_name,
@@ -62,3 +62,22 @@ def get_category_historic_data(category_name, this_month, this_year):
         else:
             historic_data[month-1].append(0)
     return historic_data
+
+def get_subcategories_hirtoric_spedning(category_name, this_year):
+    subcategories_name = get_subcategories(category_name)
+    subcategory_historic_spending = dict()
+    for subcategory in subcategories_name:
+        subcategory_historic_spending[subcategory] = []
+        for month in range(1, 13):
+            month_spending = db.session.query(func.sum(Transactions.value)).join(Category).join(Subcategory).filter(
+                Transactions.user_id == current_user.get_id(),
+                Category.name == category_name,
+                Subcategory.name == subcategory,
+                extract("month", Transactions.transaction_date) == month,
+                extract("year", Transactions.transaction_date) == this_year,
+            ).first()
+            if month_spending[0] is not None:
+                subcategory_historic_spending[subcategory].append([month, float(month_spending[0])])
+            else:
+                subcategory_historic_spending[subcategory].append([month, 0])
+    return subcategory_historic_spending
