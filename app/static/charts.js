@@ -74,3 +74,40 @@ function progress_bar(div_id, percentage_in, color) {
         }
     });
 }
+
+
+function categoryHistoryChart(div_id, catHistLabels, catHistData){
+  const ctx = document.getElementById(div_id).getContext('2d');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: catHistLabels,
+      datasets: [{
+        label: 'Planned expenses',
+        data: catHistData.map(row => row[0]),
+        borderWidth: 1,
+        backgroundColor: 'rgba(54, 162, 235, 1)', // Fully opaque color
+        borderColor: 'rgba(54, 162, 235, 1)',
+      },
+      {
+        label: 'Actual expenses',
+        data: catHistData.map(row => row[1]),
+        borderWidth: 1,
+        backgroundColor: 'rgba(255, 99, 132, 1)', // Fully opaque color
+        borderColor: 'rgba(255, 99, 132, 1)',
+      }
+      ]
+    },
+    options: {
+      layout: {
+            padding: 20
+        },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}

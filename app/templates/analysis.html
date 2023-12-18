@@ -64,7 +64,9 @@
                 <div class="text-center">
                     <h1>Category spending and budget over year</h1>
                 </div>
-
+            </div>
+            <div class="row">
+               <canvas id="myChart"></canvas>
             </div>
         </div>
     </div>
@@ -98,7 +100,16 @@
         {
             pie_chart("pie_1",pie_data,pie_labels);
         }
-
+        var jsonCatHistData = {{category_history_budget_spending | tojson}};
+        const monthNames = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        var catHistData= new Array();
+        for([month,budget,spending] of jsonCatHistData){
+            catHistData.push([budget,spending]);
+        }
+        categoryHistoryChart('myChart',monthNames, catHistData);
    });
 </script>
 {% endblock %}

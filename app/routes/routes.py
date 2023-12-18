@@ -357,4 +357,4 @@ def analysis_page():
     category_spending_percent = round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
     category_history_budget_spending = get_category_historic_data(category,this_month, this_year)
     return render_template("analysis.html", data=categories, category_spending=category_spending_percent,
-                           subcategories_spending=subcategories_spending)
+                           subcategories_spending=subcategories_spending, category_history_budget_spending=category_history_budget_spending)
