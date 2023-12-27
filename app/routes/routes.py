@@ -24,6 +24,7 @@ from app.routes.dashboard_queries import (
     get_user_monthly_budget_sums,
     get_user_monthly_transaction_sums,
     get_user_monthly_category_outcomes,
+    get_goals_data,
 )
 import pandas as pd
 from datetime import datetime, date
@@ -210,17 +211,41 @@ def get_second_field_options():
 
 @app.route("/delete-record", methods=["POST"])
 def delete_record():
-    id, record_type = json.loads(request.data).values()
-    if record_type == "transaction":
-        delete_transaction = db.session.get(Transactions, id)
+    id_, record_type = json.loads(request.data).values()
+    if record_type.lower() == "transaction":
+        delete_transaction = db.session.get(Transactions, id_)
         db.session.delete(delete_transaction)
         db.session.commit()
         flash("Transaction deleted successfully!", "success")
-    elif record_type == "budget":
-        delete_budget_entry = db.session.get(Budget, id)
+    elif record_type.lower() == "budget":
+        delete_budget_entry = db.session.get(Budget, id_)
         db.session.delete(delete_budget_entry)
         db.session.commit()
         flash("Budget plan entry deleted successfully!", "success")
+    elif record_type.lower() == "goal":
+        goal_entry = db.session.get(Goals, id_)
+        goal_transactions = (
+            Transactions.query.filter_by(user_id=current_user.get_id(), goal_id=id_)
+            .with_entities(Transactions.value)
+            .all()
+        )
+        goal_sum = float(sum([transaction[0] for transaction in goal_transactions]) if goal_transactions else 0)
+
+        record = Transactions(
+            transaction_date=datetime.now().strftime("%d/%m/%Y"),
+            value=goal_sum,
+            category_id=db.session.query(Category.id)
+            .filter(Category.name == "Income", Category.user_id == current_user.get_id())
+            .all()[0][0],
+            user_id=current_user.get_id(),
+            user_note=f"Income from closing Goal: {goal_entry.name}",
+        )
+        db.session.add(record)
+        goal_entry.goal_finished = True
+        db.session.commit()
+        flash(f"Goal plan entry deleted successfully! \n Added Income {goal_sum}", "success")
+    else:
+        flash("Something went wrong!", "danger")
     return jsonify({})
 
 
@@ -230,11 +255,22 @@ def goals():
         flash("You need to log in")
         return redirect(url_for("hello"))
     form = AddGoalForm()
+    user_goals_data = get_goals_data(current_user.get_id())
+
     if form.validate_on_submit():
-        insert_goal(form.name.data, form.target_amount.data, form.deadline.data, current_user.id)
-        flash(f"New Goal has been added", "success")
-        return render_template("addgoal.html", form=form)
-    return render_template("addgoal.html", form=form)
+        active_user_goals = (
+            Goals.query.filter_by(user_id=current_user.get_id())
+            .filter(Goals.goal_finished != True)
+            .with_entities(Goals.name)
+            .all()
+        )
+        if (str(form.name.data),) in active_user_goals:
+            flash("Invalid goal name", "danger")
+        else:
+            insert_goal(form.name.data, form.target_amount.data, form.deadline.data, current_user.id)
+            flash(f"New Goal has been added", "success")
+        return redirect("addgoal")
+    return render_template("addgoal.html", form=form, goals_data=user_goals_data)
 
 
 def insert_goal(name, target_amount, deadline, user_id):
@@ -249,46 +285,48 @@ def add_goal_progress():
         flash("You need to log in")
         return redirect(url_for("hello"))
     form = AddGoalProgress()
-    goals = db.session.query(Goals.id, Goals.name).all()
+    goals = (
+        db.session.query(Goals.id, Goals.name)
+        .filter_by(user_id=current_user.get_id())
+        .filter(Goals.goal_finished != True)
+        .all()
+    )
     # Update the choices for the dropdown field
     form.name.choices = [(str(goal.id), goal.name) for goal in goals]
 
+    goals_transactions = get_goals_transactions(current_user.get_id())
+    goals_transactions = pd.DataFrame(goals_transactions)
     if form.validate_on_submit():
         goal_transaction = Transactions(
             transaction_date=form.date.data,
             value=form.amount.data,
             goal_id=form.name.data,
             user_id=current_user.id,
-            user_note=form.date.data,
+            user_note=form.note.data,
         )
         db.session.add(goal_transaction)
         db.session.commit()
         flash(f"Goal Progress has been added", "success")
-        return render_template("addgoalprogress.html", form=form)
-    return render_template("addgoalprogress.html", form=form)
+        return redirect("addgoalprogress")
+    return render_template("addgoalprogress.html", form=form, transactions=goals_transactions)
 
 
-@app.route("/showgoals", methods=["GET", "POST"])
-def show_goals():
-    if not current_user.is_authenticated:
-        flash("You need to log in")
-        return redirect(url_for("hello"))
-
-    goals = db.session.query(Goals.id, Goals.name, Goals.target_amount, Goals.deadline, Goals.user_id)
-    transactions = (
-        db.session.query(db.func.sum(Transactions.value), Transactions.goal_id)
-        .group_by(Transactions.goal_id)
-        .order_by(Transactions.goal_id)
+def get_goals_transactions(user_id):
+    return (
+        db.session.query(
+            Transactions.id,
+            Transactions.transaction_date,
+            Transactions.value,
+            Goals.name,
+            Transactions.goal_id,
+            Transactions.user_note,
+        )
+        .join(Goals, Transactions.goal_id == Goals.id)
+        .filter(Transactions.user_id == user_id)
+        # TODO: Do we want to display transaction history for completed Goals?
+        # .filter(Goals.goal_finished != True)
         .all()
     )
-
-    # Convert to Pandas DataFrame
-    df_progres = pd.DataFrame(transactions, columns=["current_progres", "id"])
-    df_goals = pd.DataFrame(goals)
-
-    new_df = pd.merge(df_goals, df_progres, on="id", how="outer")
-    # new_df = new_df[new_df['user_id'] == current_user.id]
-    return new_df.to_html()
 
 
 @app.route("/categories", methods=["GET", "POST"])

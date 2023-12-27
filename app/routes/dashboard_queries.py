@@ -1,4 +1,4 @@
-from app.database.database import Category, Budget, Transactions
+from app.database.database import Category, Budget, Transactions, Goals
 from app import db
 from sqlalchemy import extract
 
@@ -106,4 +106,23 @@ def get_user_monthly_category_outcomes(user_id, this_month, this_year):
             ]
         )
 
+    return output
+
+
+def get_goals_data(user_id):
+    user_goals = (
+        Goals.query.filter_by(user_id=user_id)
+        .filter(Goals.goal_finished != True)
+        .with_entities(Goals.id, Goals.name, Goals.target_amount, Goals.deadline)
+        .all()
+    )
+    output = []
+
+    for id_, name, target, deadline in user_goals:
+        goal_transactions = (
+            Transactions.query.filter_by(user_id=user_id, goal_id=id_).with_entities(Transactions.value).all()
+        )
+        goal_sum = float(sum([transaction[0] for transaction in goal_transactions]) if goal_transactions else 0)
+        goal_percentage = int((goal_sum / float(target)) * 100) if goal_sum != 0 else 0
+        output.append([id_, name, target, deadline, goal_sum, goal_percentage])
     return output
