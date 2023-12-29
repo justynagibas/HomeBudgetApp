@@ -27,10 +27,10 @@ def add_budget_entry(form, user_id, entry_type, year, month):
     db.session.commit()
 
 
-def get_budget_entries(user_id):
+def get_budget_entries(user_id, year, month):
     return (
         db.session.query(Budget.id, Category.name, Budget.amount, Budget.month, Budget.year)
         .join(Category, Budget.category_id == Category.id)
-        .filter(Budget.user_id == user_id)
+        .filter(Budget.user_id == user_id, Budget.month == month, Budget.year == year)
         .all()
     )

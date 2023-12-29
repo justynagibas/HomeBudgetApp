@@ -34,8 +34,8 @@ from app.routes.forms import AddGoalForm, AddGoalProgress
 
 
 this_date = datetime.now().strftime("%B, %Y")
-this_month = date.today().month
-this_year = date.today().year
+this_month = date.today().month  # TODO: make this changeable in nav
+this_year = date.today().year  # TODO: make this changeable in nav
 
 
 @app.route("/")
@@ -132,7 +132,7 @@ def tutorial():
 @app.route("/transaction_tracking", methods=["GET", "POST"])
 def transaction_tracking():
     if current_user.is_authenticated:
-        results = get_transactions(current_user.id)
+        results = get_transactions(current_user.id, this_year, this_month)
         # Convert to Pandas DataFrame
         df = pd.DataFrame(results)
         form_outcome = TransOutcomeForm(prefix="outcome")
@@ -172,18 +172,18 @@ def budget_tracking():
 
         form_income = BudgetIncomeForm(prefix="income")
 
-        budget_entries = pd.DataFrame(get_budget_entries(current_user.id))
+        budget_entries = pd.DataFrame(get_budget_entries(current_user.id, this_year, this_month))
         print(budget_entries)
 
         if request.method == "POST":
             if form_outcome.submit.data:
                 if form_outcome.validate():
-                    add_budget_entry(form_outcome, current_user.id, "outcome", date.today().year, date.today().month)
+                    add_budget_entry(form_outcome, current_user.id, "outcome", this_year, this_month)
                     flash("Budget outcome added successfully!", "success")
                     return redirect(url_for("budget_tracking"))
             elif form_income.submit.data:
                 if form_income.validate():
-                    add_budget_entry(form_income, current_user.id, "income", date.today().year, date.today().month)
+                    add_budget_entry(form_income, current_user.id, "income", this_year, this_month)
                     flash("Budget income added successfully!", "success")
                     return redirect(url_for("budget_tracking"))
 
