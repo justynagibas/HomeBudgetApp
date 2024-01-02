@@ -348,14 +348,56 @@ def get_subcategory_field_options():
 
 
 
-@app.route("/analysis", methods=["GET", "POST"])
-def analysis_page():
+# @app.route("/analysis", methods=["GET", "POST"])
+# def analysis_page(category='Food'):
+#     categories = get_categories()
+#     categories.remove("Income")
+#     category_plan = get_category_plan(category,this_month, this_year)
+#     subcategories_spending = get_subcategories_spendings(category, this_month, this_year)
+#     category_spending_percent = round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
+#     category_history_budget_spending = get_category_historic_data(category, this_year)
+#     subcategory_history_spending = get_subcategories_hirtoric_spedning(category, this_year)
+#     return render_template("analysis.html", data=categories, category_spending=category_spending_percent,
+#                            subcategories_spending=subcategories_spending, category_history_budget_spending=category_history_budget_spending,
+#                            subcategory_history_spending=subcategory_history_spending)
+#
+# @app.route("/get_analysis_category", methods=["POST"])
+# def get_analysis_category():
+#     selected_cat = request.form.get("selected_value")
+#     selected_cat = selected_cat if selected_cat is not None else 'Food'
+#     # Use the selected value to determine the new options for the second field
+#     # Replace this logic with your own based on your requirements
+#     # subcategory_choices = get_subcategories(selected_cat)
+#     #
+#     # # Return the new options as JSON
+#     # return jsonify(subcategory_choices)
+#     return analysis_page(selected_cat)
+
+def get_analysis_data(category='Food'):
     categories = get_categories()
-    category = 'Food'
-    category_plan = get_category_plan(category,this_month, this_year)
+    categories.remove("Income")
+    category_plan = get_category_plan(category, this_month, this_year)
     subcategories_spending = get_subcategories_spendings(category, this_month, this_year)
     category_spending_percent = round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
     category_history_budget_spending = get_category_historic_data(category, this_year)
     subcategory_history_spending = get_subcategories_hirtoric_spedning(category, this_year)
-    return render_template("analysis.html", data=categories, category_spending=category_spending_percent,
-                           subcategories_spending=subcategories_spending, category_history_budget_spending=category_history_budget_spending)
+
+    return {
+        "data": categories,
+        "category_spending": category_spending_percent,
+        "subcategories_spending": subcategories_spending,
+        "category_history_budget_spending": category_history_budget_spending,
+        "subcategory_history_spending": subcategory_history_spending
+    }
+
+@app.route("/analysis", methods=["GET", "POST"])
+def analysis_page(category='Food'):
+    analysis_data = get_analysis_data(category)
+    return render_template("analysis.html", **analysis_data)
+
+@app.route("/get_analysis_category", methods=["POST"])
+def get_analysis_category():
+    selected_cat = request.form.get("selected_value")
+    selected_cat = selected_cat if selected_cat is not None else 'Food'
+    analysis_data = get_analysis_data(selected_cat)
+    return render_template("analysis.html", **analysis_data)

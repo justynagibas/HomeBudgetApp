@@ -16,6 +16,7 @@ def get_category_progress(category_name, this_month, this_year):
 
 def get_category_plan(category_name, this_month, this_year):
     plan = db.session.query(Budget.amount).join(Category).filter(
+        Budget.user_id == current_user.get_id(),
         Category.name == category_name,
         Budget.year == this_year,
         Budget.month == this_month

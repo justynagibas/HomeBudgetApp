@@ -3,7 +3,7 @@
     <div class="col-md-12" style="text-align: center">
         <h1><strong>Budget Analysis</strong></h1>
     </div>
-    <select class="form-select form-control bg-dark text-white col-md-6 offset-md-3" aria-label="Category select" id="category-select" onchange="updateHiddenField()">
+    <select class="form-select form-control bg-dark text-white col-md-6 offset-md-3" aria-label="Category select" id="category-select">
         {% for category in data %}
               <option value="{{category}}">{{ category }}</option>
         {% endfor %}
@@ -71,45 +71,106 @@
         </div>
     </div>
 </div>
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        progress_bar("month_progress",{{category_spending}},"rgb(176, 196, 222)");
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    progress_bar("month_progress",{{category_spending}},"rgb(176, 196, 222)");
 
-        var categories = {{subcategories_spending | tojson}};
-        var pie_labels = new Array();
-        var pie_data = new Array();
+    var categories = {{subcategories_spending | tojson}};
+    var pie_labels = new Array();
+    var pie_data = new Array();
 
-        for(var i =0 ;i < categories.length;i++){
-            cat_name = categories[i][0];
-            id_name = cat_name + "_bar";
-            //var percentage = 0;
-            //if(categories[i][1] != 0)
-            //{
-            //    percentage = categories[i][1]/category_spending*100;
-            //    if(percentage > 100)
-            //    {
-            //        percentage = 100;
-            //    }
-            //}
-            //progress_bar(id_name,percentage,'rgb(176, 196, 222)');
-            pie_labels.push(cat_name);
-            pie_data.push(categories[i][1]);
-        }
+    for(var i =0 ;i < categories.length;i++){
+        cat_name = categories[i][0];
+        id_name = cat_name + "_bar";
+        pie_labels.push(cat_name);
+        pie_data.push(categories[i][1]);
+    }
 
-        if(categories.length > 0)
-        {
-            pie_chart("pie_1",pie_data,pie_labels);
+    if(categories.length > 0)
+    {
+        pie_chart("pie_1",pie_data,pie_labels);
+    }
+    var jsonCatHistData = {{category_history_budget_spending | tojson}};
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    var catHistData= new Array();
+    for([month,budget,spending] of jsonCatHistData){
+        catHistData.push([budget,spending]);
+    }
+    categoryHistoryChart('myChart',monthNames, catHistData);
+});
+</script>
+{#<script>#}
+{#    function plotCharts() {#}
+{#            progress_bar("month_progress",{{category_spending}},"rgb(176, 196, 222)");#}
+{##}
+{#            var categories = {{subcategories_spending | tojson}};#}
+{#            var pie_labels = new Array();#}
+{#            var pie_data = new Array();#}
+{##}
+{#            for(var i = 0; i < categories.length; i++) {#}
+{#                cat_name = categories[i][0];#}
+{#                id_name = cat_name + "_bar";#}
+{#                pie_labels.push(cat_name);#}
+{#                pie_data.push(categories[i][1]);#}
+{#            }#}
+{##}
+{#            if(categories.length > 0) {#}
+{#                pie_chart("pie_1", pie_data, pie_labels);#}
+{#            }#}
+{##}
+{#            var jsonCatHistData = {{category_history_budget_spending | tojson}};#}
+{#            const monthNames = [#}
+{#                'January', 'February', 'March', 'April', 'May', 'June',#}
+{#                'July', 'August', 'September', 'October', 'November', 'December'#}
+{#            ];#}
+{#            var catHistData= new Array();#}
+{#            for([month, budget, spending] of jsonCatHistData) {#}
+{#                catHistData.push([budget, spending]);#}
+{#            }#}
+{#            categoryHistoryChart('myChart', monthNames, catHistData);#}
+{#    }#}
+{#</script>#}
+<script>
+  // Function to fetch and update subcategory options
+  function analysisCategoryPlots(selectedValue) {
+    // Make an AJAX request to fetch the new options for the second field
+    $.ajax({
+      url: '/get_analysis_category',  // Update the URL to match your Flask route
+      method: 'POST',
+      data: { selected_value: selectedValue },
+      dataType: 'json',
+      success: function(data) {
+        // Get the SelectField you want to update
+        var categoryField = $('#category-select');
+        // Clear existing options
+        categoryField.empty();
+        // Add new options based on the data from the server
+        for (var i = 0; i < data.length; i++) {
+          categoryField.append($('<option>', {
+            value: data[i],
+            text: data[i]
+          }));
         }
-        var jsonCatHistData = {{category_history_budget_spending | tojson}};
-        const monthNames = [
-          'January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        var catHistData= new Array();
-        for([month,budget,spending] of jsonCatHistData){
-            catHistData.push([budget,spending]);
-        }
-        categoryHistoryChart('myChart',monthNames, catHistData);
-   });
+      }
+    });
+  }
+
+  // Execute the function on initial load
+  $(document).ready(function() {
+    // Call the function with the default selected value
+    analysisCategoryPlots($('#category-select').val());
+  });
+
+  // Attach the change event handler
+  $('#category-select').change(function() {
+    // Get the selected value
+    var selectedValue = $(this).val();
+    console.log('Selected Value:', selectedValue);
+    // Call the function to update options based on the selected value
+    analysisCategoryPlots(selectedValue);
+  });
 </script>
 {% endblock %}
