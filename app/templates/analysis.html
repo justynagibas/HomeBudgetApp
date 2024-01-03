@@ -1,15 +1,25 @@
 {% extends "main_layout.html" %} {% block content %}
 <div class="row mt-3">
     <div class="col-md-12" style="text-align: center">
-        <h1><strong>Budget Analysis</strong></h1>
+        {% if subcategory_history_spending %}
+            {{ subcategory_history_spending }}
+        {% else %}
+            <h1><strong>Budget Analysis</strong></h1>
+        {% endif %}
     </div>
-    <select class="form-select form-control bg-dark text-white col-md-6 offset-md-3" aria-label="Category select" id="category-select">
-        {% for category in data %}
-              <option value="{{category}}">{{ category }}</option>
-        {% endfor %}
-    </select>
-    <div class="container">
-        <div class="card bg-dark border-0 text-light" style="padding: 10px; height: 100%;">
+    <div class="form-inline col-md-12 m-0 p-0">
+        <div class="form-group col-md-12 m-0 p-0">
+        <select class="form-control bg-dark text-white col-md flex-grow-1" aria-label="Category select" id="category-select" onchange="submitForm()">
+            {% for category in data %}
+                  <option value="{{category}}" {% if category == default_category %}selected{% endif %}>{{ category }}</option>
+            {% endfor %}
+        </select>
+        <select class="form-control bg-dark text-white col-md flex-grow-1" aria-label="Subategory select" id="subcategory-select" onchange="submitForm()">
+        </select>
+        </div>
+    </div>
+{#    <div class="container container-fluid">#}
+        <div class="card bg-dark border-0 text-light w-100" style="padding: 10px; height: 100%;">
             <div class="row" style="display: flex; justify-content: center; align-items: center;">
                 <h3>This month spending</h3>
             </div>
@@ -57,6 +67,8 @@
                     {% endif %}
                 </div>
             </div>
+        </div>
+        <div class="card bg-dark border-0 text-light w-100" style="padding: 10px; height: 100%; margin-top: 10%;">
             <div class="row">
                 <div class="col-md-12 mt-5" style="text-align: center">
                     <h1><strong>Historic data</strong></h1>
@@ -69,10 +81,11 @@
                <canvas id="myChart"></canvas>
             </div>
         </div>
-    </div>
+{#    </div>#}
+    <div>cieść</div>
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+
     progress_bar("month_progress",{{category_spending}},"rgb(176, 196, 222)");
 
     var categories = {{subcategories_spending | tojson}};
@@ -100,77 +113,72 @@ document.addEventListener("DOMContentLoaded", function() {
         catHistData.push([budget,spending]);
     }
     categoryHistoryChart('myChart',monthNames, catHistData);
-});
 </script>
-{#<script>#}
-{#    function plotCharts() {#}
-{#            progress_bar("month_progress",{{category_spending}},"rgb(176, 196, 222)");#}
-{##}
-{#            var categories = {{subcategories_spending | tojson}};#}
-{#            var pie_labels = new Array();#}
-{#            var pie_data = new Array();#}
-{##}
-{#            for(var i = 0; i < categories.length; i++) {#}
-{#                cat_name = categories[i][0];#}
-{#                id_name = cat_name + "_bar";#}
-{#                pie_labels.push(cat_name);#}
-{#                pie_data.push(categories[i][1]);#}
-{#            }#}
-{##}
-{#            if(categories.length > 0) {#}
-{#                pie_chart("pie_1", pie_data, pie_labels);#}
-{#            }#}
-{##}
-{#            var jsonCatHistData = {{category_history_budget_spending | tojson}};#}
-{#            const monthNames = [#}
-{#                'January', 'February', 'March', 'April', 'May', 'June',#}
-{#                'July', 'August', 'September', 'October', 'November', 'December'#}
-{#            ];#}
-{#            var catHistData= new Array();#}
-{#            for([month, budget, spending] of jsonCatHistData) {#}
-{#                catHistData.push([budget, spending]);#}
-{#            }#}
-{#            categoryHistoryChart('myChart', monthNames, catHistData);#}
-{#    }#}
-{#</script>#}
+
+<form id="category-form" method="post" style="display: none;">
+    <input type="hidden" name="selected_category" id="selected-category-input">
+    <input type="hidden" name="selected_subcategory" id="selected-subcategory-input">
+</form>
+
+<script>
+    function submitForm() {
+        // Get the selected value from the subcategory select
+        var selectedCategory = $('#category-select').val();
+
+        // Call the AJAX function to update the subcategory options
+        analysisSubcategory(selectedCategory);
+
+        var selectedSubcategory = document.getElementById('subcategory-select').value;
+        document.getElementById('selected-subcategory-input').value = selectedSubcategory;
+        var selectedCategory = document.getElementById('category-select').value;
+        document.getElementById('selected-category-input').value = selectedCategory;
+        document.getElementById("category-form").submit();
+    }
+</script>
 <script>
   // Function to fetch and update subcategory options
-  function analysisCategoryPlots(selectedValue) {
+  function analysisSubcategory(selectedValue) {
     // Make an AJAX request to fetch the new options for the second field
     $.ajax({
-      url: '/get_analysis_category',  // Update the URL to match your Flask route
+      url: '/get_subcategory_field_options',  // Update the URL to match your Flask route
       method: 'POST',
       data: { selected_value: selectedValue },
       dataType: 'json',
       success: function(data) {
-        // Get the SelectField you want to update
-        var categoryField = $('#category-select');
-        // Clear existing options
-        categoryField.empty();
-        // Add new options based on the data from the server
-        for (var i = 0; i < data.length; i++) {
-          categoryField.append($('<option>', {
-            value: data[i],
-            text: data[i]
-          }));
+            // Get the SelectField you want to update
+            var subcategoryList = $('#subcategory-select');
+            // Clear existing options
+            subcategoryList.empty();
+
+            var option = $('<option>', {
+                    value: null,
+                    text: "<---choose subcategory--->"
+                });
+            subcategoryList.append(option);
+
+            var defaultSubcategory = '{{ default_subcategory }}';
+
+            // Add new options based on the data from the server
+            for (var i = 0; i < data.length; i++) {
+                var option = $('<option>', {
+                    value: data[i],
+                    text: data[i]
+                });
+                if (data[i] === defaultSubcategory) {
+                    option.prop('selected', true);
+                }
+
+                subcategoryList.append(option);
+            }
         }
-      }
     });
   }
 
   // Execute the function on initial load
   $(document).ready(function() {
     // Call the function with the default selected value
-    analysisCategoryPlots($('#category-select').val());
+    analysisSubcategory($('#category-select').val());
   });
 
-  // Attach the change event handler
-  $('#category-select').change(function() {
-    // Get the selected value
-    var selectedValue = $(this).val();
-    console.log('Selected Value:', selectedValue);
-    // Call the function to update options based on the selected value
-    analysisCategoryPlots(selectedValue);
-  });
 </script>
 {% endblock %}

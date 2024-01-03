@@ -37,7 +37,7 @@ def get_subcategories_spendings(category_name, this_month, this_year):
     for i in range(len(subcategories_spending)):
         subcategories_spending[i] = list(subcategories_spending[i])
         subcategories_spending[i][1] = float(subcategories_spending[i][1])
-    return  subcategories_spending
+    return subcategories_spending
 
 def get_category_historic_data(category_name,  this_year):
     historic_data = []
@@ -64,21 +64,19 @@ def get_category_historic_data(category_name,  this_year):
             historic_data[month-1].append(0)
     return historic_data
 
-def get_subcategories_hirtoric_spedning(category_name, this_year):
-    subcategories_name = get_subcategories(category_name)
-    subcategory_historic_spending = dict()
-    for subcategory in subcategories_name:
-        subcategory_historic_spending[subcategory] = []
+def get_subcategories_hirtoric_spedning(category_name,subcategory_name, this_year):
+    subcategory_historic_spending = []
+    if subcategory_name is not None:
         for month in range(1, 13):
-            month_spending = db.session.query(func.sum(Transactions.value)).join(Category).join(Subcategory).filter(
+            month_spending = db.session.query(func.sum(Transactions.value)).join(Category).join(Subcategory, Transactions.subcategory_id==Subcategory.id).filter(
                 Transactions.user_id == current_user.get_id(),
                 Category.name == category_name,
-                Subcategory.name == subcategory,
+                Subcategory.name == subcategory_name,
                 extract("month", Transactions.transaction_date) == month,
                 extract("year", Transactions.transaction_date) == this_year,
             ).first()
             if month_spending[0] is not None:
-                subcategory_historic_spending[subcategory].append([month, float(month_spending[0])])
+                subcategory_historic_spending.append([month, float(month_spending[0])])
             else:
-                subcategory_historic_spending[subcategory].append([month, 0])
+                subcategory_historic_spending.append([month, 0])
     return subcategory_historic_spending
