@@ -1,0 +1,207 @@
+{% extends "main_layout.html" %} {% block content %}
+<div class="row mt-3">
+    <div class="col-md-12" style="text-align: center">
+        <h1><strong>Budget Analysis</strong></h1>
+    </div>
+    <div class="form-inline col-md-12 m-0 p-0">
+        <div class="form-group col-md-12 m-0 p-0">
+        <select class="form-control bg-dark text-white col-md flex-grow-1" aria-label="Category select" id="category-select" onchange="submitForm('onlyCat')">
+            {% for category in data %}
+                  <option value="{{category}}" {% if category == default_category %}selected{% endif %}>{{ category }}</option>
+            {% endfor %}
+        </select>
+        <select class="form-control bg-dark text-white col-md flex-grow-1" aria-label="Subategory select" id="subcategory-select" onchange="submitForm()">
+        </select>
+        </div>
+    </div>
+{#    <div class="container container-fluid">#}
+        <div class="card bg-dark border-0 text-light w-100" style="padding: 10px; height: 100%;">
+            <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                <h3>This month spending</h3>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-11">
+                    <canvas id="month_progress" style="height: 25px"></canvas>
+                </div>
+                <div class="col-md-1" style="display: flex; justify-content: center; align-items: center;">
+                    {{category_spending}}%
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6" style="padding:10px;">
+                    <div class="table-responsive card mt-4">
+                        <table class="table table-dark table-striped mb-0 transaction-table table-bordered">
+                            <thead>
+                                <tr>
+                                   <th colspan="6" class="text-center"><h3>Subcategories spending </h3></th>
+                                </tr>
+                                <tr>
+                                   <th scope="col" class="text-center">Subcategory</th>
+                                   <th scope="col" class="text-center">Total spending</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%  if not subcategories_spending.empty %}
+                                    {% for name, value in subcategories_spending %}
+                                        <tr>
+                                            <td>{{ name }}</td>
+                                            <td>{{ value }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6" style = "display: grid; place-items: center">
+                    {% if subcategories_spending is defined and subcategories_spending|length > 0 %}
+                        <canvas id="pie_1"></canvas>
+                    {% else %}
+                        <div style = "display: grid; place-items: center;">
+                            <h6>Please add new transactions to see the analysis!</h6>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card bg-dark border-0 text-light w-100" style="padding: 10px; height: 100%; margin-top: 10%;">
+            <div class="row">
+                <div class="col-md-12 mt-5" style="text-align: center">
+                    <h1><strong>Historic data</strong></h1>
+                </div>
+                <div class="col-md-12 mt-5" style="text-align: center">
+                    <h2>Category spending and budget over year</h2>
+                </div>
+            </div>
+            <div class="row">
+               <canvas id="myChart"></canvas>
+            </div>
+        </div>
+        {% if subcategory_history_spending %}
+            <div class="card bg-dark border-0 text-light w-100" style="padding: 10px; height: 100%;">
+            <div class="row">
+                <div class="col-md-12 mt-5" style="text-align: center">
+                    <h2>Subategory spending over year</h2>
+                </div>
+            </div>
+            <div class="row">
+               <canvas id="subcatHistoryChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+</div>
+<script>
+    progress_bar("month_progress",{{category_spending}},"rgb(176, 196, 222)");
+
+    var categories = {{subcategories_spending | tojson}};
+    var pie_labels = new Array();
+    var pie_data = new Array();
+
+    for(var i =0 ;i < categories.length;i++){
+        cat_name = categories[i][0];
+        id_name = cat_name + "_bar";
+        pie_labels.push(cat_name);
+        pie_data.push(categories[i][1]);
+    }
+
+    if(categories.length > 0)
+    {
+        pie_chart("pie_1",pie_data,pie_labels);
+    }
+    var jsonCatHistData = {{category_history_budget_spending | tojson}};
+    var jsonSubcatHistData = {{subcategory_history_spending | tojson}};
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    var catHistData= new Array();
+    for([month,budget,spending] of jsonCatHistData){
+        catHistData.push([budget,spending]);
+    }
+    categoryHistoryChart('myChart',monthNames, catHistData);
+
+    if(jsonSubcatHistData.length > 0){
+        var subcatHistData= new Array();
+        for([month,budget,spending] of jsonSubcatHistData){
+            subcatHistData.push([budget,spending]);
+        }
+        subcategoryHistoryChart('subcatHistoryChart',monthNames, subcatHistData);
+    }
+</script>
+
+<form id="category-form" method="post" style="display: none;">
+    <input type="hidden" name="selected_category" id="selected-category-input">
+    <input type="hidden" name="selected_subcategory" id="selected-subcategory-input">
+</form>
+
+<script>
+    function submitForm(cat_or_no) {
+        // Get the selected value from the subcategory select
+        var selectedCategory = $('#category-select').val();
+        if(cat_or_no === 'onlyCat'){
+           var selectedSubcategory = '';
+        } else {
+            var selectedSubcategory = document.getElementById('subcategory-select').value;
+        }
+        document.getElementById('selected-subcategory-input').value = selectedSubcategory;
+        var selectedCategory = document.getElementById('category-select').value;
+        document.getElementById('selected-category-input').value = selectedCategory;
+        document.getElementById("category-form").submit();
+    }
+</script>
+<script>
+  // Function to fetch and update subcategory options
+  function analysisSubcategory(selectedValue) {
+    // Make an AJAX request to fetch the new options for the second field
+    $.ajax({
+      url: '/get_subcategory_field_options',  // Update the URL to match your Flask route
+      method: 'POST',
+      data: { selected_value: selectedValue },
+      dataType: 'json',
+      success: function(data) {
+            // Get the SelectField you want to update
+            var subcategoryList = $('#subcategory-select');
+            // Clear existing options
+            subcategoryList.empty();
+
+            var option = $('<option>', {
+                    value: '',
+                    text: "<---choose subcategory--->"
+                });
+            subcategoryList.append(option);
+
+            var defaultSubcategory = '{{ default_subcategory }}';
+
+            // Add new options based on the data from the server
+            for (var i = 0; i < data.length; i++) {
+                var option = $('<option>', {
+                    value: data[i],
+                    text: data[i]
+                });
+                if (data[i] === defaultSubcategory) {
+                    option.prop('selected', true);
+                }
+
+                subcategoryList.append(option);
+            }
+            loadCharts;
+        }
+    });
+  }
+
+  // Execute the function on initial load
+  $(document).ready(function() {
+    // Call the function with the default selected value
+    analysisSubcategory($('#category-select').val());
+  });
+
+ // Attach the change event handler
+  $('#category-select').change(function() {
+    // Get the selected value
+    var selectedValue = $(this).val();
+    console.log('Selected Value:', selectedValue);
+    // Call the function to update options based on the selected value
+    analysisSubcategory(selectedValue);
+  });
+</script>
+{% endblock %}

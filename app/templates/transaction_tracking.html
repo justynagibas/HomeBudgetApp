@@ -244,6 +244,11 @@
                     // Clear existing options
                     subCategoryField.empty();
 
+                    subCategoryField.append($('<option>', {
+                            value: 'No subcategory',
+                            text: 'No subcategory'
+                        }));
+
                     // Add new options based on the data from the server
                     for (var i = 0; i < data.length; i++) {
                         subCategoryField.append($('<option>', {

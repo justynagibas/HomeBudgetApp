@@ -1,7 +1,12 @@
 function pie_chart(div_id, data, labels){
-    const ctx = document.getElementById(div_id).getContext('2d');
+    const canvas = document.getElementById(div_id);
+    const ctx = canvas.getContext('2d');
+    // Check if the chart instance exists and destroy it
+    if (canvas.chart) {
+        canvas.chart.destroy();
+    }
 
-    new Chart(ctx, {
+    canvas.chart = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: labels,
@@ -22,10 +27,15 @@ function pie_chart(div_id, data, labels){
 }
 
 function progress_bar(div_id, percentage_in, color) {
-    const ctx = document.getElementById(div_id).getContext('2d');
+    const canvas = document.getElementById(div_id);
+    const ctx = canvas.getContext('2d');
+    // Check if the chart instance exists and destroy it
+    if (canvas.chart) {
+        canvas.chart.destroy();
+    }
     var percentage = percentage_in <=100 ? percentage_in : 100;
 
-    var stackedBarChart = new Chart(ctx, {
+    canvas.chart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Category 1'],
@@ -73,4 +83,81 @@ function progress_bar(div_id, percentage_in, color) {
             events: []
         }
     });
+}
+
+
+function categoryHistoryChart(div_id, catHistLabels, catHistData){
+  const canvas = document.getElementById(div_id);
+    const ctx = canvas.getContext('2d');
+    // Check if the chart instance exists and destroy it
+    if (canvas.chart) {
+        canvas.chart.destroy();
+    }
+
+    canvas.chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: catHistLabels,
+      datasets: [{
+        label: 'Planned expenses',
+        data: catHistData.map(row => row[0]),
+        borderWidth: 1,
+        backgroundColor: 'rgba(54, 162, 235, 1)', // Fully opaque color
+        borderColor: 'rgba(54, 162, 235, 1)',
+      },
+      {
+        label: 'Actual expenses',
+        data: catHistData.map(row => row[1]),
+        borderWidth: 1,
+        backgroundColor: 'rgba(255, 99, 132, 1)', // Fully opaque color
+        borderColor: 'rgba(255, 99, 132, 1)',
+      }
+      ]
+    },
+    options: {
+      layout: {
+            padding: 20
+        },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function subcategoryHistoryChart(div_id, catHistLabels, catHistData){
+    const canvas = document.getElementById(div_id);
+    const ctx = canvas.getContext('2d');
+    // Check if the chart instance exists and destroy it
+    if (canvas.chart) {
+        canvas.chart.destroy();
+    }
+
+   canvas.chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: catHistLabels,
+      datasets: [
+      {
+        label: 'Actual expenses',
+        data: catHistData.map(row => row[0]),
+        borderWidth: 1,
+        backgroundColor: 'rgba(255, 99, 132, 1)', // Fully opaque color
+        borderColor: 'rgba(255, 99, 132, 1)',
+      }
+      ]
+    },
+    options: {
+      layout: {
+            padding: 20
+        },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
 }
