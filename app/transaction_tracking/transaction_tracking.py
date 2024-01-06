@@ -24,7 +24,7 @@ def add_transaction(form, userID, transaction_type):
         record.category_id = db.session.query(Category.id).filter(Category.name == form.main_category.data, Category.user_id==userID).all()[0][0]
 
     subcategory_id = db.session.query(Subcategory.id).filter(Subcategory.name == form.subcategory.data, Subcategory.category_id == record.category_id).all()
-    if not subcategory_id:
+    if not subcategory_id or form.subcategory.data == 'No subcategory':
         record.subcategory_id = None
     else:
         record.subcategory_id = subcategory_id[0][0]

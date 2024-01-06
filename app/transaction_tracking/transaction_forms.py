@@ -12,7 +12,7 @@ class TransOutcomeForm(FlaskForm):
     main_category = SelectField("Main category:", choices=[], validators=[InputRequired(), Length(max=100)])
     subcategory = SelectField(
         "Subcategory:",
-        choices=[],
+        choices=["No subcategory"],
         validators=[Length(max=100), Optional()],
     )
     submit = SubmitField("Add new outcome")
@@ -24,5 +24,5 @@ class TransIncomeForm(FlaskForm):
         "Value:", validators=[DataRequired(), NumberRange(min=0, message="Transaction has to be positive!")]
     )
     date = DateField("Date:", validators=[DataRequired()])
-    subcategory = SelectField("Subcategory:", choices=[], validators=[Optional(), Length(max=100)])
+    subcategory = SelectField("Subcategory:", choices=["No subcategory"], validators=[Optional(), Length(max=100)])
     submit = SubmitField("Add new income")
