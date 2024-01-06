@@ -142,7 +142,7 @@ function subcategoryHistoryChart(div_id, catHistLabels, catHistData){
       datasets: [
       {
         label: 'Actual expenses',
-        data: catHistData.map(row => row[1]),
+        data: catHistData.map(row => row[0]),
         borderWidth: 1,
         backgroundColor: 'rgba(255, 99, 132, 1)', // Fully opaque color
         borderColor: 'rgba(255, 99, 132, 1)',

@@ -376,6 +376,10 @@ def get_subcategory_field_options():
 def get_analysis_data(category,subcategory):
     categories = get_categories()
     categories.remove("Income")
+    if category is None:
+        category = categories[0]
+    if subcategory == '':
+        subcategory = None
     category_plan = get_category_plan(category, this_month, this_year)
     subcategories_spending = get_subcategories_spendings(category, this_month, this_year)
     category_spending_percent = round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
@@ -396,7 +400,6 @@ def get_analysis_data(category,subcategory):
 def analysis_page():
     selected_cat = request.form.get("selected_category")
     selected_subcat = request.form.get("selected_subcategory")
-    selected_cat = selected_cat if selected_cat is not None else 'Food'
     analysis_data = get_analysis_data(selected_cat, selected_subcat)
     return render_template("analysis.html", **analysis_data)
 

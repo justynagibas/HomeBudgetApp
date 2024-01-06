@@ -1,3 +1,4 @@
+import sqlalchemy
 from sqlalchemy import func, extract
 from app import db
 from app.database.database import Category, Budget, Transactions, Subcategory, Users
@@ -34,9 +35,18 @@ def get_subcategories_spendings(category_name, this_month, this_year):
         extract("year", Transactions.transaction_date) == this_year,
         Subcategory.name.in_(subcategories)
     ).group_by(Subcategory.name).all()
+    no_subcategory_speeding = db.session.query(func.sum(Transactions.value)).join(Category).filter(
+        Transactions.user_id == current_user.get_id(),
+        extract("month", Transactions.transaction_date) == this_month,
+        extract("year", Transactions.transaction_date) == this_year,
+        Category.name == category_name,
+        Transactions.subcategory_id == None
+    ).first()
     for i in range(len(subcategories_spending)):
         subcategories_spending[i] = list(subcategories_spending[i])
         subcategories_spending[i][1] = float(subcategories_spending[i][1])
+    if no_subcategory_speeding[0] is not None:
+        subcategories_spending.append(["no assigned subcategory", float(no_subcategory_speeding[0])])
     return subcategories_spending
 
 def get_category_historic_data(category_name,  this_year):
