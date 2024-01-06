@@ -18,7 +18,13 @@ from app.category.manage_category import (
     get_subcategories,
     get_categories,
 )
-from app.analysis.plot_queries import get_category_progress, get_category_plan, get_subcategories_spendings, get_category_historic_data, get_subcategories_hirtoric_spedning
+from app.analysis.plot_queries import (
+    get_category_progress,
+    get_category_plan,
+    get_subcategories_spendings,
+    get_category_historic_data,
+    get_subcategories_hirtoric_spedning,
+)
 from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
@@ -35,8 +41,26 @@ from app.routes.forms import AddGoalForm, AddGoalProgress
 
 
 this_date = datetime.now().strftime("%B, %Y")
-this_month = date.today().month  # TODO: make this changeable in nav
-this_year = date.today().year  # TODO: make this changeable in nav
+this_month = date.today().month
+this_year = date.today().year
+
+
+@app.context_processor
+def inject_current_date():
+    return dict(selected_month=this_month, selected_year=this_year)
+
+
+@app.route("/update_date", methods=["POST"])
+def update_date():
+    global this_month, this_year, this_date
+
+    # Handle form submission logic here
+    selected_date = request.form["datePicker"]
+    this_month, this_year = selected_date.split("/")
+    this_date = datetime.strptime(selected_date, "%m/%Y").strftime("%B, %Y")
+
+    # Redirect back to the referring page
+    return redirect(request.referrer)
 
 
 @app.route("/")
@@ -50,7 +74,12 @@ def hello():
 
 @app.route("/home")
 def home():
-    percent_of_month = round((date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100)
+    if int(this_month) < date.today().month or int(this_year) < date.today().year:
+        percent_of_month = 100
+    else:
+        percent_of_month = round(
+            (date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100
+        )
 
     user_income_plan, user_outcome_plan = get_user_monthly_budget_sums(current_user.get_id(), this_month, this_year)
     user_planned_balance = user_income_plan - user_outcome_plan
@@ -385,7 +414,6 @@ def get_subcategory_field_options():
     return jsonify(subcategory_choices)
 
 
-
 # @app.route("/analysis", methods=["GET", "POST"])
 # def analysis_page(category='Food'):
 #     categories = get_categories()
@@ -411,18 +439,21 @@ def get_subcategory_field_options():
 #     # return jsonify(subcategory_choices)
 #     return analysis_page(selected_cat)
 
-def get_analysis_data(category,subcategory):
+
+def get_analysis_data(category, subcategory):
     categories = get_categories()
     categories.remove("Income")
     if category is None:
         category = categories[0]
-    if subcategory == '':
+    if subcategory == "":
         subcategory = None
     category_plan = get_category_plan(category, this_month, this_year)
     subcategories_spending = get_subcategories_spendings(category, this_month, this_year)
-    category_spending_percent = round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
+    category_spending_percent = (
+        round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
+    )
     category_history_budget_spending = get_category_historic_data(category, this_year)
-    subcategory_history_spending = get_subcategories_hirtoric_spedning(category,subcategory , this_year)
+    subcategory_history_spending = get_subcategories_hirtoric_spedning(category, subcategory, this_year)
 
     return {
         "default_category": category,
@@ -431,8 +462,9 @@ def get_analysis_data(category,subcategory):
         "category_spending": category_spending_percent,
         "subcategories_spending": subcategories_spending,
         "category_history_budget_spending": category_history_budget_spending,
-        "subcategory_history_spending": subcategory_history_spending
+        "subcategory_history_spending": subcategory_history_spending,
     }
+
 
 @app.route("/analysis", methods=["GET", "POST"])
 def analysis_page():
@@ -440,4 +472,3 @@ def analysis_page():
     selected_subcat = request.form.get("selected_subcategory")
     analysis_data = get_analysis_data(selected_cat, selected_subcat)
     return render_template("analysis.html", **analysis_data)
-

@@ -14,9 +14,8 @@
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css"/>
     <link rel="stylesheet" href="../static/style.css">
-
-
     <title>{% block title %}Home{% endblock %}</title>
   </head>
   <body class="bg-main">
@@ -46,6 +45,17 @@
           {% endif %}
           <a class="nav-item nav-link" id="About" href="/about">About</a>
           <a class="nav-item nav-link" id="Tutorial" href="/tutorial">Tutorial</a>
+        </div>
+        <div class="navbar-nav ml-auto">
+            <form method="post" action="{{ url_for('update_date') }}">
+                <div class="input-group">
+                    <input class="form-control bg-dark text-white" type="text" name="datePicker" id="datePicker" value="{{  "%02d"|format(selected_month|int) }}/{{ selected_year }}" style="max-width: 100px">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-light btn-sm" type="submit" id="submit-btn">Set date</button>
+                    </div>
+                </div>
+            </form>
+        </div>
         </div>
       </div>
     </nav>
@@ -80,6 +90,7 @@
       integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../static/charts.js"></script>
     <script src="../static/utils.js"></script>
