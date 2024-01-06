@@ -30,5 +30,6 @@ def create_goals_table(db):
         target_amount = Column(Numeric(10, 2))
         deadline = Column(Date)
         user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+        goal_finished = Column(Boolean, nullable=False, default=False)
 
     return Goal
