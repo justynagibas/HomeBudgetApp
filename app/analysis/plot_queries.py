@@ -12,8 +12,11 @@ def get_category_progress(category_name, this_month, this_year):
         Category.name == category_name,
         extract("month", Transactions.transaction_date) == this_month,
         extract("year", Transactions.transaction_date) == this_year,
-        ).all()
-    return float(transactions[0][0])
+        ).first()
+    if transactions[0] is not None:
+        return float(transactions[0])
+    else:
+        return 0
 
 def get_category_plan(category_name, this_month, this_year):
     plan = db.session.query(Budget.amount).join(Category).filter(
