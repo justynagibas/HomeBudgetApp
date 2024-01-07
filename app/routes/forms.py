@@ -8,14 +8,14 @@ from app.database.database import Users, Groups, Category, Subcategory, UserGrou
 class AddGoalForm(FlaskForm):
     name = StringField("Goal Name", validators=[DataRequired()])
     target_amount = IntegerField("Target amount", validators=[DataRequired(), NumberRange(min=1)])
-    deadline = DateField("Deadline", format="%Y-%m-%d", validators=[DataRequired()])
+    deadline = StringField("Deadline", validators=[DataRequired()])
     submit = SubmitField("Add Goal")
 
 
 class AddGoalProgress(FlaskForm):
     name = SelectField("Goal", choices=[])
     amount = IntegerField("Amount", validators=[DataRequired()])
-    date = DateField("Date", format="%Y-%m-%d", validators=[DataRequired()])
+    date = StringField("Date", validators=[DataRequired()])
     note = StringField("Note")
     submit = SubmitField("Add Goal Progress")
 

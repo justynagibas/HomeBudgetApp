@@ -284,7 +284,7 @@ def goals():
     if not current_user.is_authenticated:
         flash("You need to log in")
         return redirect(url_for("hello"))
-    form = AddGoalForm()
+    form = AddGoalForm(prefix="goal")
     user_goals_data = get_goals_data(current_user.get_id())
 
     if form.validate_on_submit():
@@ -314,7 +314,7 @@ def add_goal_progress():
     if not current_user.is_authenticated:
         flash("You need to log in")
         return redirect(url_for("hello"))
-    form = AddGoalProgress()
+    form = AddGoalProgress(prefix="goal-progress")
     goals = (
         db.session.query(Goals.id, Goals.name)
         .filter_by(user_id=current_user.get_id())

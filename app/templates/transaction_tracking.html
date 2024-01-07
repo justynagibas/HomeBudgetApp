@@ -107,7 +107,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form_outcome.date(class="form-control", type="date") }}
+                                {{ form_outcome.date(class="form-control") }}
                             {% endif %}
                         </div>
                         <div class="form-group">
@@ -178,7 +178,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form_income.date(class="form-control", type="date") }}
+                                {{ form_income.date(class="form-control") }}
                             {% endif %}
                         </div>
                         <div class="form-group">
@@ -261,4 +261,5 @@
         });
     });
 </script>
+
 {% endblock %}
