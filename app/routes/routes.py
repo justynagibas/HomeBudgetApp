@@ -18,7 +18,13 @@ from app.category.manage_category import (
     get_subcategories,
     get_categories,
 )
-from app.analysis.plot_queries import get_category_progress, get_category_plan, get_subcategories_spendings, get_category_historic_data, get_subcategories_hirtoric_spedning
+from app.analysis.plot_queries import (
+    get_category_progress,
+    get_category_plan,
+    get_subcategories_spendings,
+    get_category_historic_data,
+    get_subcategories_hirtoric_spedning,
+)
 from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
 from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
@@ -298,12 +304,18 @@ def add_goal_progress():
     goals_transactions = get_goals_transactions(current_user.get_id())
     goals_transactions = pd.DataFrame(goals_transactions)
     if form.validate_on_submit():
+        category_id = (
+            db.session.query(Category.id)
+            .filter(Category.name == "Goals", Category.user_id == current_user.id)
+            .all()[0][0]
+        )
         goal_transaction = Transactions(
             transaction_date=form.date.data,
             value=form.amount.data,
             goal_id=form.name.data,
             user_id=current_user.id,
             user_note=form.note.data,
+            category_id=category_id,
         )
         db.session.add(goal_transaction)
         db.session.commit()
@@ -385,7 +397,6 @@ def get_subcategory_field_options():
     return jsonify(subcategory_choices)
 
 
-
 # @app.route("/analysis", methods=["GET", "POST"])
 # def analysis_page(category='Food'):
 #     categories = get_categories()
@@ -411,18 +422,21 @@ def get_subcategory_field_options():
 #     # return jsonify(subcategory_choices)
 #     return analysis_page(selected_cat)
 
-def get_analysis_data(category,subcategory):
+
+def get_analysis_data(category, subcategory):
     categories = get_categories()
     categories.remove("Income")
     if category is None:
         category = categories[0]
-    if subcategory == '':
+    if subcategory == "":
         subcategory = None
     category_plan = get_category_plan(category, this_month, this_year)
     subcategories_spending = get_subcategories_spendings(category, this_month, this_year)
-    category_spending_percent = round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
+    category_spending_percent = (
+        round(get_category_progress(category, this_month, this_year) / category_plan * 100) if category_plan != 0 else 0
+    )
     category_history_budget_spending = get_category_historic_data(category, this_year)
-    subcategory_history_spending = get_subcategories_hirtoric_spedning(category,subcategory , this_year)
+    subcategory_history_spending = get_subcategories_hirtoric_spedning(category, subcategory, this_year)
 
     return {
         "default_category": category,
@@ -431,8 +445,9 @@ def get_analysis_data(category,subcategory):
         "category_spending": category_spending_percent,
         "subcategories_spending": subcategories_spending,
         "category_history_budget_spending": category_history_budget_spending,
-        "subcategory_history_spending": subcategory_history_spending
+        "subcategory_history_spending": subcategory_history_spending,
     }
+
 
 @app.route("/analysis", methods=["GET", "POST"])
 def analysis_page():
@@ -440,4 +455,3 @@ def analysis_page():
     selected_subcat = request.form.get("selected_subcategory")
     analysis_data = get_analysis_data(selected_cat, selected_subcat)
     return render_template("analysis.html", **analysis_data)
-

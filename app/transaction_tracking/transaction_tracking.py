@@ -15,6 +15,7 @@ def get_transaction_categories(userId, category_type):
     elif category_type == "outcome":
         user_outcome_categories = db.session.query(Category.name).filter(Category.user_id == userId).all()
         user_outcome_categories.remove(("Income",))
+        user_outcome_categories.remove(("Goals",))
         user_outcome_dict = {}
         for category_record in user_outcome_categories:
             category_name = category_record[0]
@@ -48,7 +49,7 @@ def add_transaction(form, userID, transaction_type):
         .filter(Subcategory.name == form.subcategory.data, Subcategory.category_id == record.category_id)
         .all()
     )
-    if not subcategory_id or form.subcategory.data == 'No subcategory':
+    if not subcategory_id or form.subcategory.data == "No subcategory":
         record.subcategory_id = None
     else:
         record.subcategory_id = subcategory_id[0][0]
@@ -57,6 +58,7 @@ def add_transaction(form, userID, transaction_type):
 
 
 def get_transactions(userId, year, month):
+    category_id = db.session.query(Category.id).filter(Category.name == "Goals", Category.user_id == userId).all()[0][0]
     return (
         db.session.query(
             Transactions.id,
@@ -70,6 +72,7 @@ def get_transactions(userId, year, month):
         .outerjoin(Subcategory, Transactions.subcategory_id == Subcategory.id)
         .filter(
             Transactions.user_id == userId,
+            Transactions.category_id != category_id,  # remove goal progress transactions
             extract("month", Transactions.transaction_date) == month,
             extract("year", Transactions.transaction_date) == year,
         )

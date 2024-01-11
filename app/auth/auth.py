@@ -25,14 +25,13 @@ def insert_user(username, password):
         "Others",
         "Debt",
         "Investment",
+        "Goals",
     ]
 
     userId = db.session.query(Users).filter(Users.user_name == username).first().id
 
     for category in default_categories:
-        if category == "Income":
-            record = Category(name=category, user_id=userId, undeletable=True)
-        elif category == "Others":
+        if category in ["Income", "Others", "Goals"]:
             record = Category(name=category, user_id=userId, undeletable=True)
         else:
             record = Category(name=category, user_id=userId, undeletable=False)
