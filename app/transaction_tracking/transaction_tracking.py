@@ -15,6 +15,7 @@ def get_transaction_categories(userId, category_type):
     elif category_type == "outcome":
         user_outcome_categories = db.session.query(Category.name).filter(Category.user_id == userId).all()
         user_outcome_categories.remove(("Income",))
+        user_outcome_categories.remove(("Goals",))
         user_outcome_dict = {}
         for category_record in user_outcome_categories:
             category_name = category_record[0]
