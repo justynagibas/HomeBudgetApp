@@ -41,8 +41,26 @@ from app.routes.forms import AddGoalForm, AddGoalProgress
 
 
 this_date = datetime.now().strftime("%B, %Y")
-this_month = date.today().month  # TODO: make this changeable in nav
-this_year = date.today().year  # TODO: make this changeable in nav
+this_month = date.today().month
+this_year = date.today().year
+
+
+@app.context_processor
+def inject_current_date():
+    return dict(selected_month=this_month, selected_year=this_year)
+
+
+@app.route("/update_date", methods=["POST"])
+def update_date():
+    global this_month, this_year, this_date
+
+    # Handle form submission logic here
+    selected_date = request.form["datePicker"]
+    this_month, this_year = selected_date.split("/")
+    this_date = datetime.strptime(selected_date, "%m/%Y").strftime("%B, %Y")
+
+    # Redirect back to the referring page
+    return redirect(request.referrer)
 
 
 @app.route("/")
@@ -56,7 +74,12 @@ def hello():
 
 @app.route("/home")
 def home():
-    percent_of_month = round((date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100)
+    if int(this_month) < date.today().month or int(this_year) < date.today().year:
+        percent_of_month = 100
+    else:
+        percent_of_month = round(
+            (date.today().day / calendar.monthrange(date.today().year, date.today().month)[1]) * 100
+        )
 
     user_income_plan, user_outcome_plan = get_user_monthly_budget_sums(current_user.get_id(), this_month, this_year)
     user_planned_balance = user_income_plan - user_outcome_plan
@@ -261,7 +284,7 @@ def goals():
     if not current_user.is_authenticated:
         flash("You need to log in")
         return redirect(url_for("hello"))
-    form = AddGoalForm()
+    form = AddGoalForm(prefix="goal")
     user_goals_data = get_goals_data(current_user.get_id())
 
     if form.validate_on_submit():
@@ -291,7 +314,7 @@ def add_goal_progress():
     if not current_user.is_authenticated:
         flash("You need to log in")
         return redirect(url_for("hello"))
-    form = AddGoalProgress()
+    form = AddGoalProgress(prefix="goal-progress")
     goals = (
         db.session.query(Goals.id, Goals.name)
         .filter_by(user_id=current_user.get_id())
