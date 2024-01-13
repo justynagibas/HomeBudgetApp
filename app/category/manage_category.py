@@ -6,6 +6,7 @@ from flask_login import current_user
 def get_categories():
     categories_db = db.session.query(Category.name).filter(Category.user_id == current_user.get_id()).all()
     categories = [category[0] for category in categories_db]
+    categories.remove("Goals")
     return categories
 
 
