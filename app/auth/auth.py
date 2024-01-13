@@ -1,5 +1,5 @@
 from app import login_manager, bcrypt, db
-from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
+from app.database.database import Users, Category
 
 
 def insert_user(username, password):

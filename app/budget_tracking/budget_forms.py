@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, DateField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Length, InputRequired, Optional, NumberRange
+from wtforms import FloatField, SubmitField, SelectField
+from wtforms.validators import DataRequired, Length, InputRequired, NumberRange
 
 
 class BudgetOutcomeForm(FlaskForm):
