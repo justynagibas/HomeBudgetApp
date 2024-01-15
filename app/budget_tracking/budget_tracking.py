@@ -1,5 +1,5 @@
 from app import db
-from app.database.database import Users, Groups, Category, Subcategory, Budget
+from app.database.database import Category, Budget
 
 
 def get_budget_categories_names(user_id):

@@ -1,9 +1,7 @@
 import json
-
-from app import app, request, db
+from app import app, db
 from flask import render_template, redirect, url_for, flash, request, jsonify
-import sqlalchemy
-from app.auth.auth import insert_user, check_user_credentials, load_user
+from app.auth.auth import insert_user, check_user_credentials
 from flask_login import login_user, current_user, logout_user
 from app.auth.auth_forms import SingupForm, LoginForm
 from app.transaction_tracking.transaction_forms import TransOutcomeForm, TransIncomeForm
@@ -26,7 +24,7 @@ from app.analysis.plot_queries import (
     get_subcategories_hirtoric_spedning,
 )
 from app.category.category_forms import AddCategoryForm, AddSubcategoryForm, RemoveSubcategoryForm, RemoveCategoryForm
-from app.database.database import Users, Groups, Category, Subcategory, UserGroup, Transactions, Goals, Budget
+from app.database.database import Category, Transactions, Goals, Budget
 from app.routes.dashboard_queries import (
     get_user_monthly_budget_sums,
     get_user_monthly_transaction_sums,

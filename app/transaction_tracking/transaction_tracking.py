@@ -1,5 +1,5 @@
 from app import db
-from app.database.database import Users, Groups, Category, Subcategory, Transactions
+from app.database.database import Category, Subcategory, Transactions
 from sqlalchemy import extract
 
 
